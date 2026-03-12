@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Python Practice"
+version = "1.0.0"
+id = "artifacts/python-exercises"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 22689
+name = "web"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/python-exercises run dev"
+
+[services.env]
+PORT = "22689"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/python-exercises", "run", "build"]
+publicDir = "artifacts/python-exercises/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"

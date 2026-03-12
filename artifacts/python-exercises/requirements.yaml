@@ -1,0 +1,19 @@
+packages:
+  "framer-motion": "For smooth page transitions, progress bar animations, and feedback popups."
+  "react-syntax-highlighter": "Essential for rendering Python code blocks with syntax highlighting in exercises."
+  "@types/react-syntax-highlighter": "Type definitions for react-syntax-highlighter."
+  "lucide-react": "For UI icons like checkmarks, crosses, hints, and navigation."
+  "clsx": "Utility for constructing className strings conditionally."
+  "tailwind-merge": "Utility for merging tailwind classes without style conflicts."
+
+images:
+  - path: "artifacts/python-exercises/public/images/hero-bg.png"
+    description: "A bright, inviting abstract background with soft geometric shapes, subtle grid lines, and smooth gradients in educational colors like cyan, sunny yellow, and soft violet. Minimalist and modern."
+    aspect_ratio: "16:9"
+  - path: "artifacts/python-exercises/public/images/python-mascot.png"
+    description: "A cute, friendly 3D cartoon snake wearing oversized round reading glasses and smiling, holding a small textbook. Rendered with soft, bright studio lighting on a transparent or clean white background. High quality Pixar style."
+    aspect_ratio: "1:1"
+
+notes:
+  - Using generated hooks from @workspace/api-client-react for data fetching.
+  - Assuming the API handles checking answers and returns { correct, feedback, correctAnswer }.

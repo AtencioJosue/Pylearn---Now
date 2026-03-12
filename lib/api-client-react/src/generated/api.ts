@@ -5,18 +5,27 @@
  * API specification
  * OpenAPI spec version: 0.1.0
  */
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
+  MutationFunction,
   QueryFunction,
   QueryKey,
+  UseMutationOptions,
+  UseMutationResult,
   UseQueryOptions,
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  AnswerResult,
+  AnswerSubmission,
+  Exercise,
+  HealthStatus,
+  Progress,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
-import type { ErrorType } from "../custom-fetch";
+import type { ErrorType, BodyType } from "../custom-fetch";
 
 type AwaitedInput<T> = PromiseLike<T> | T;
 
@@ -92,6 +101,329 @@ export function useHealthCheck<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getHealthCheckQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Returns list of Python exercises
+ * @summary Get all exercises
+ */
+export const getGetExercisesUrl = () => {
+  return `/api/exercises`;
+};
+
+export const getExercises = async (
+  options?: RequestInit,
+): Promise<Exercise[]> => {
+  return customFetch<Exercise[]>(getGetExercisesUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetExercisesQueryKey = () => {
+  return [`/api/exercises`] as const;
+};
+
+export const getGetExercisesQueryOptions = <
+  TData = Awaited<ReturnType<typeof getExercises>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getExercises>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetExercisesQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getExercises>>> = ({
+    signal,
+  }) => getExercises({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getExercises>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetExercisesQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getExercises>>
+>;
+export type GetExercisesQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get all exercises
+ */
+
+export function useGetExercises<
+  TData = Awaited<ReturnType<typeof getExercises>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getExercises>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetExercisesQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get exercise by ID
+ */
+export const getGetExerciseUrl = (id: number) => {
+  return `/api/exercises/${id}`;
+};
+
+export const getExercise = async (
+  id: number,
+  options?: RequestInit,
+): Promise<Exercise> => {
+  return customFetch<Exercise>(getGetExerciseUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetExerciseQueryKey = (id: number) => {
+  return [`/api/exercises/${id}`] as const;
+};
+
+export const getGetExerciseQueryOptions = <
+  TData = Awaited<ReturnType<typeof getExercise>>,
+  TError = ErrorType<void>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getExercise>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetExerciseQueryKey(id);
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getExercise>>> = ({
+    signal,
+  }) => getExercise(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getExercise>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetExerciseQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getExercise>>
+>;
+export type GetExerciseQueryError = ErrorType<void>;
+
+/**
+ * @summary Get exercise by ID
+ */
+
+export function useGetExercise<
+  TData = Awaited<ReturnType<typeof getExercise>>,
+  TError = ErrorType<void>,
+>(
+  id: number,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getExercise>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetExerciseQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Check user's answer
+ */
+export const getCheckAnswerUrl = (id: number) => {
+  return `/api/exercises/${id}/check`;
+};
+
+export const checkAnswer = async (
+  id: number,
+  answerSubmission: AnswerSubmission,
+  options?: RequestInit,
+): Promise<AnswerResult> => {
+  return customFetch<AnswerResult>(getCheckAnswerUrl(id), {
+    ...options,
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...options?.headers },
+    body: JSON.stringify(answerSubmission),
+  });
+};
+
+export const getCheckAnswerMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof checkAnswer>>,
+    TError,
+    { id: number; data: BodyType<AnswerSubmission> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof checkAnswer>>,
+  TError,
+  { id: number; data: BodyType<AnswerSubmission> },
+  TContext
+> => {
+  const mutationKey = ["checkAnswer"];
+  const { mutation: mutationOptions, request: requestOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, request: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof checkAnswer>>,
+    { id: number; data: BodyType<AnswerSubmission> }
+  > = (props) => {
+    const { id, data } = props ?? {};
+
+    return checkAnswer(id, data, requestOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type CheckAnswerMutationResult = NonNullable<
+  Awaited<ReturnType<typeof checkAnswer>>
+>;
+export type CheckAnswerMutationBody = BodyType<AnswerSubmission>;
+export type CheckAnswerMutationError = ErrorType<unknown>;
+
+/**
+ * @summary Check user's answer
+ */
+export const useCheckAnswer = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof checkAnswer>>,
+    TError,
+    { id: number; data: BodyType<AnswerSubmission> },
+    TContext
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseMutationResult<
+  Awaited<ReturnType<typeof checkAnswer>>,
+  TError,
+  { id: number; data: BodyType<AnswerSubmission> },
+  TContext
+> => {
+  return useMutation(getCheckAnswerMutationOptions(options));
+};
+
+/**
+ * @summary Get user progress
+ */
+export const getGetProgressUrl = () => {
+  return `/api/progress`;
+};
+
+export const getProgress = async (options?: RequestInit): Promise<Progress> => {
+  return customFetch<Progress>(getGetProgressUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetProgressQueryKey = () => {
+  return [`/api/progress`] as const;
+};
+
+export const getGetProgressQueryOptions = <
+  TData = Awaited<ReturnType<typeof getProgress>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getProgress>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetProgressQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getProgress>>> = ({
+    signal,
+  }) => getProgress({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getProgress>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetProgressQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getProgress>>
+>;
+export type GetProgressQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get user progress
+ */
+
+export function useGetProgress<
+  TData = Awaited<ReturnType<typeof getProgress>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof getProgress>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetProgressQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

@@ -14,3 +14,70 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Returns list of Python exercises
+ * @summary Get all exercises
+ */
+export const GetExercisesResponseItem = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string(),
+  topic: zod.string(),
+  difficulty: zod.enum(["beginner", "intermediate", "advanced"]),
+  type: zod.enum(["multiple_choice", "fill_blank", "predict_output"]),
+  question: zod.string(),
+  options: zod.array(zod.string()).optional(),
+  hint: zod.string().optional(),
+  explanation: zod.string(),
+  orderIndex: zod.number(),
+});
+export const GetExercisesResponse = zod.array(GetExercisesResponseItem);
+
+/**
+ * @summary Get exercise by ID
+ */
+export const GetExerciseParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const GetExerciseResponse = zod.object({
+  id: zod.number(),
+  title: zod.string(),
+  description: zod.string(),
+  topic: zod.string(),
+  difficulty: zod.enum(["beginner", "intermediate", "advanced"]),
+  type: zod.enum(["multiple_choice", "fill_blank", "predict_output"]),
+  question: zod.string(),
+  options: zod.array(zod.string()).optional(),
+  hint: zod.string().optional(),
+  explanation: zod.string(),
+  orderIndex: zod.number(),
+});
+
+/**
+ * @summary Check user's answer
+ */
+export const CheckAnswerParams = zod.object({
+  id: zod.coerce.number(),
+});
+
+export const CheckAnswerBody = zod.object({
+  answer: zod.string(),
+});
+
+export const CheckAnswerResponse = zod.object({
+  correct: zod.boolean(),
+  feedback: zod.string(),
+  correctAnswer: zod.string(),
+});
+
+/**
+ * @summary Get user progress
+ */
+export const GetProgressResponse = zod.object({
+  totalExercises: zod.number(),
+  completedExercises: zod.number(),
+  correctAnswers: zod.number(),
+  topicProgress: zod.record(zod.string(), zod.number()),
+});

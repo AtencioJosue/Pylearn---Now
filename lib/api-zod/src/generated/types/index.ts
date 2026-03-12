@@ -6,4 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./answerResult";
+export * from "./answerSubmission";
+export * from "./exercise";
+export * from "./exerciseDifficulty";
+export * from "./exerciseType";
 export * from "./healthStatus";
+export * from "./progress";
+export * from "./progressTopicProgress";

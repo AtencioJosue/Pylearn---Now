@@ -8,3 +8,53 @@
 export interface HealthStatus {
   status: string;
 }
+
+export type ExerciseDifficulty =
+  (typeof ExerciseDifficulty)[keyof typeof ExerciseDifficulty];
+
+export const ExerciseDifficulty = {
+  beginner: "beginner",
+  intermediate: "intermediate",
+  advanced: "advanced",
+} as const;
+
+export type ExerciseType = (typeof ExerciseType)[keyof typeof ExerciseType];
+
+export const ExerciseType = {
+  multiple_choice: "multiple_choice",
+  fill_blank: "fill_blank",
+  predict_output: "predict_output",
+} as const;
+
+export interface Exercise {
+  id: number;
+  title: string;
+  description: string;
+  topic: string;
+  difficulty: ExerciseDifficulty;
+  type: ExerciseType;
+  question: string;
+  options?: string[];
+  hint?: string;
+  explanation: string;
+  orderIndex: number;
+}
+
+export interface AnswerSubmission {
+  answer: string;
+}
+
+export interface AnswerResult {
+  correct: boolean;
+  feedback: string;
+  correctAnswer: string;
+}
+
+export type ProgressTopicProgress = { [key: string]: number };
+
+export interface Progress {
+  totalExercises: number;
+  completedExercises: number;
+  correctAnswers: number;
+  topicProgress: ProgressTopicProgress;
+}
