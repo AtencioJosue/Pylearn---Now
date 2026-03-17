@@ -1,7 +1,7 @@
 import { useGetExercises, useGetProgress } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Play, Code2, Brain, ChevronRight, CheckCircle2 } from "lucide-react";
+import { Play, Code2, Brain, CheckCircle2 } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 
 export function Home() {
@@ -16,7 +16,6 @@ export function Home() {
     );
   }
 
-  // Group exercises by topic
   const topicsMap = exercises?.reduce((acc, ex) => {
     if (!acc[ex.topic]) {
       acc[ex.topic] = [];
@@ -49,12 +48,12 @@ export function Home() {
     <div className="min-h-screen bg-background pb-20">
       <Navbar />
       
-      {/* Hero Section */}
+      {/* Sección Principal */}
       <div className="relative overflow-hidden bg-white border-b border-border/50">
         <div className="absolute inset-0 z-0">
           <img 
             src={`${import.meta.env.BASE_URL}images/hero-bg.png`} 
-            alt="Abstract educational background" 
+            alt="Fondo educativo abstracto" 
             className="w-full h-full object-cover opacity-60"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-white/90" />
@@ -70,7 +69,7 @@ export function Home() {
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary font-bold text-sm mb-6"
               >
                 <Code2 className="w-4 h-4" />
-                Python for Beginners
+                Python para principiantes
               </motion.div>
               <motion.h1 
                 initial={{ opacity: 0, y: 20 }}
@@ -78,9 +77,9 @@ export function Home() {
                 transition={{ duration: 0.5, delay: 0.1 }}
                 className="text-5xl md:text-7xl font-bold font-display text-foreground leading-tight mb-6"
               >
-                Master Python <br/>
+                Aprende Python <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-accent">
-                  One line at a time.
+                  una línea a la vez.
                 </span>
               </motion.h1>
               <motion.p 
@@ -89,7 +88,7 @@ export function Home() {
                 transition={{ duration: 0.5, delay: 0.2 }}
                 className="text-xl text-muted-foreground max-w-2xl mx-auto md:mx-0 mb-8 leading-relaxed"
               >
-                Interactive exercises, instant feedback, and clear explanations. Build your coding intuition today.
+                Ejercicios interactivos, retroalimentación inmediata y explicaciones claras. Construye tu intuición de programación hoy.
               </motion.p>
             </div>
             
@@ -103,7 +102,7 @@ export function Home() {
                 <div className="absolute inset-0 bg-gradient-to-tr from-secondary/40 to-primary/40 blur-3xl rounded-full" />
                 <img 
                   src={`${import.meta.env.BASE_URL}images/python-mascot.png`} 
-                  alt="Friendly Python Mascot" 
+                  alt="Mascota amigable de Python" 
                   className="w-full h-auto drop-shadow-2xl relative z-10 hover:-translate-y-2 transition-transform duration-500"
                 />
               </div>
@@ -112,21 +111,21 @@ export function Home() {
         </div>
       </div>
 
-      {/* Progress Overview */}
+      {/* Resumen de progreso */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-20">
         <div className="bg-white rounded-3xl shadow-xl shadow-black/5 border border-border p-6 flex items-center justify-around flex-wrap gap-8">
           <div className="text-center">
-            <p className="text-muted-foreground font-bold uppercase tracking-wider text-sm mb-1">Total Exercises</p>
+            <p className="text-muted-foreground font-bold uppercase tracking-wider text-sm mb-1">Total de ejercicios</p>
             <p className="text-4xl font-display font-bold text-foreground">{progress?.totalExercises || 0}</p>
           </div>
           <div className="w-px h-12 bg-border hidden sm:block"></div>
           <div className="text-center">
-            <p className="text-muted-foreground font-bold uppercase tracking-wider text-sm mb-1">Completed</p>
+            <p className="text-muted-foreground font-bold uppercase tracking-wider text-sm mb-1">Completados</p>
             <p className="text-4xl font-display font-bold text-primary">{progress?.completedExercises || 0}</p>
           </div>
           <div className="w-px h-12 bg-border hidden sm:block"></div>
           <div className="text-center">
-            <p className="text-muted-foreground font-bold uppercase tracking-wider text-sm mb-1">Accuracy</p>
+            <p className="text-muted-foreground font-bold uppercase tracking-wider text-sm mb-1">Precisión</p>
             <p className="text-4xl font-display font-bold text-success">
               {progress?.totalExercises ? Math.round((progress.correctAnswers / progress.completedExercises) * 100) || 0 : 0}%
             </p>
@@ -134,11 +133,11 @@ export function Home() {
         </div>
       </div>
 
-      {/* Topics Grid */}
+      {/* Cuadrícula de temas */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
         <div className="flex items-center gap-3 mb-8">
           <Brain className="w-8 h-8 text-primary" />
-          <h2 className="text-3xl font-display font-bold">Choose a Topic</h2>
+          <h2 className="text-3xl font-display font-bold">Elige un tema</h2>
         </div>
 
         <motion.div 
@@ -176,7 +175,7 @@ export function Home() {
                   
                   <div className="mt-8">
                     <div className="flex justify-between text-sm font-bold text-muted-foreground mb-2">
-                      <span>{percent}% Complete</span>
+                      <span>{percent}% completado</span>
                       <span>{topic.completed} / {topic.total}</span>
                     </div>
                     <div className="w-full h-3 bg-muted rounded-full overflow-hidden">

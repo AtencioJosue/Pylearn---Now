@@ -6,14 +6,30 @@ import {
   useGetExercises, 
   useCheckAnswer, 
   AnswerResult,
-  ExerciseType
 } from "@workspace/api-client-react";
 import { Navbar } from "@/components/Navbar";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Lightbulb, CheckCircle2, XCircle, ArrowRight, Zap, RefreshCcw } from "lucide-react";
+import { Lightbulb, CheckCircle2, XCircle, ArrowRight, Zap } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+const difficultyLabels: Record<string, string> = {
+  beginner: "Principiante",
+  intermediate: "Intermedio",
+  advanced: "Avanzado",
+};
+
+const difficultyColors: Record<string, string> = {
+  beginner: "bg-green-100 text-green-700",
+  intermediate: "bg-yellow-100 text-yellow-700",
+  advanced: "bg-red-100 text-red-700",
+};
+
+const typePlaceholders: Record<string, string> = {
+  fill_blank: "Escribe el código que falta...",
+  predict_output: "Escribe lo que imprimiría el código...",
+};
 
 export function ExerciseView() {
   const [, params] = useRoute("/exercise/:id");
@@ -28,7 +44,6 @@ export function ExerciseView() {
   const [showHint, setShowHint] = useState(false);
   const [result, setResult] = useState<AnswerResult | null>(null);
 
-  // Reset state when exercise changes
   useEffect(() => {
     setSelectedAnswer("");
     setShowHint(false);
@@ -81,7 +96,7 @@ export function ExerciseView() {
       <Navbar backTo="/" />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
-        {/* Header info */}
+        {/* Encabezado */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <span className="px-3 py-1 bg-primary/10 text-primary font-bold text-xs rounded-full uppercase tracking-wider">
@@ -89,15 +104,13 @@ export function ExerciseView() {
             </span>
             <span className={cn(
               "px-3 py-1 font-bold text-xs rounded-full uppercase tracking-wider",
-              exercise.difficulty === "beginner" ? "bg-green-100 text-green-700" :
-              exercise.difficulty === "intermediate" ? "bg-yellow-100 text-yellow-700" :
-              "bg-red-100 text-red-700"
+              difficultyColors[exercise.difficulty] ?? "bg-gray-100 text-gray-700"
             )}>
-              {exercise.difficulty}
+              {difficultyLabels[exercise.difficulty] ?? exercise.difficulty}
             </span>
           </div>
           <span className="text-muted-foreground font-bold text-sm">
-            Exercise {exercise.orderIndex}
+            Ejercicio {exercise.orderIndex}
           </span>
         </div>
 
@@ -107,7 +120,7 @@ export function ExerciseView() {
 
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
           
-          {/* Left Column: Context & Code */}
+          {/* Columna izquierda: Contexto y código */}
           <div className="lg:col-span-3 space-y-6">
             <div className="prose prose-slate max-w-none text-foreground/80 leading-relaxed text-lg">
               <p>{exercise.description}</p>
@@ -125,7 +138,7 @@ export function ExerciseView() {
                     className="flex items-center gap-2 text-secondary font-bold hover:text-secondary/80 transition-colors"
                   >
                     <Lightbulb className="w-5 h-5" />
-                    Show Hint
+                    Ver pista
                   </button>
                 ) : (
                   <motion.div 
@@ -141,12 +154,12 @@ export function ExerciseView() {
             )}
           </div>
 
-          {/* Right Column: Interaction */}
+          {/* Columna derecha: Interacción */}
           <div className="lg:col-span-2 space-y-6 relative">
             <Card className="p-6 sticky top-24">
               <h3 className="font-display font-bold text-xl mb-4 flex items-center gap-2">
                 <Zap className="w-5 h-5 text-accent" />
-                Your Answer
+                Tu respuesta
               </h3>
 
               {isMultipleChoice && exercise.options && (
@@ -198,8 +211,9 @@ export function ExerciseView() {
                       type="text"
                       value={selectedAnswer}
                       onChange={(e) => setSelectedAnswer(e.target.value)}
+                      onKeyDown={(e) => e.key === "Enter" && !hasAnswered && handleSubmit()}
                       disabled={hasAnswered}
-                      placeholder={exercise.type === "fill_blank" ? "Type the missing code..." : "Type the output..."}
+                      placeholder={typePlaceholders[exercise.type ?? ""] ?? "Escribe tu respuesta..."}
                       className={cn(
                         "w-full bg-slate-50 border-2 border-border rounded-xl px-5 py-4 font-mono text-lg focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all",
                         hasAnswered && result?.correct && "border-success bg-success/5 text-success font-bold focus:ring-0",
@@ -212,7 +226,7 @@ export function ExerciseView() {
                   
                   {hasAnswered && !result?.correct && result?.correctAnswer && (
                     <div className="text-sm font-medium text-slate-500 mt-2 flex items-center gap-2">
-                      Correct answer: <code className="bg-slate-100 px-2 py-1 rounded text-foreground">{result.correctAnswer}</code>
+                      Respuesta correcta: <code className="bg-slate-100 px-2 py-1 rounded text-foreground">{result.correctAnswer}</code>
                     </div>
                   )}
                 </div>
@@ -225,7 +239,7 @@ export function ExerciseView() {
                   onClick={handleSubmit}
                   disabled={!selectedAnswer || checkMutation.isPending}
                 >
-                  {checkMutation.isPending ? "Checking..." : "Submit Answer"}
+                  {checkMutation.isPending ? "Verificando..." : "Enviar respuesta"}
                 </Button>
               ) : (
                 <Button 
@@ -234,11 +248,11 @@ export function ExerciseView() {
                   variant={result.correct ? "success" : "default"}
                   onClick={handleNext}
                 >
-                  Continue <ArrowRight className="w-5 h-5 ml-2" />
+                  Continuar <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
               )}
 
-              {/* Feedback Animation Area */}
+              {/* Área de retroalimentación */}
               <AnimatePresence>
                 {hasAnswered && (
                   <motion.div
@@ -252,12 +266,12 @@ export function ExerciseView() {
                     <h4 className={cn("font-bold text-lg mb-1 flex items-center gap-2", 
                       result.correct ? "text-success" : "text-destructive"
                     )}>
-                      {result.correct ? "Awesome!" : "Not quite."}
+                      {result.correct ? "¡Muy bien!" : "Casi, sigue intentando."}
                     </h4>
                     <p className="text-sm leading-relaxed">{result.feedback}</p>
                     {result.correct && exercise.explanation && (
                       <div className="mt-3 pt-3 border-t border-success/20 text-sm">
-                        <span className="font-bold block mb-1">Why it works:</span>
+                        <span className="font-bold block mb-1">¿Por qué funciona así?</span>
                         {exercise.explanation}
                       </div>
                     )}
