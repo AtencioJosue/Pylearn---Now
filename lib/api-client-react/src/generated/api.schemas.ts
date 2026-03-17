@@ -16,6 +16,7 @@ export const ExerciseDifficulty = {
   beginner: "beginner",
   intermediate: "intermediate",
   advanced: "advanced",
+  tryhard: "tryhard",
 } as const;
 
 export type ExerciseType = (typeof ExerciseType)[keyof typeof ExerciseType];

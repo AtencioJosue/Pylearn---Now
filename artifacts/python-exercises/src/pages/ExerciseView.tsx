@@ -17,13 +17,15 @@ import { cn } from "@/lib/utils";
 const difficultyLabels: Record<string, string> = {
   beginner: "Principiante",
   intermediate: "Intermedio",
-  advanced: "Avanzado",
+  advanced: "Difícil",
+  tryhard: "Tryhard",
 };
 
 const difficultyColors: Record<string, string> = {
   beginner: "bg-green-100 text-green-700",
   intermediate: "bg-yellow-100 text-yellow-700",
   advanced: "bg-red-100 text-red-700",
+  tryhard: "bg-purple-100 text-purple-700",
 };
 
 const typePlaceholders: Record<string, string> = {

@@ -13,4 +13,5 @@ export const ExerciseDifficulty = {
   beginner: "beginner",
   intermediate: "intermediate",
   advanced: "advanced",
+  tryhard: "tryhard",
 } as const;

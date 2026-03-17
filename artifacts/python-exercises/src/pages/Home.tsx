@@ -1,7 +1,7 @@
 import { useGetExercises, useGetProgress } from "@workspace/api-client-react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
-import { Play, Code2, Brain, CheckCircle2 } from "lucide-react";
+import { Play, Code2, Brain, CheckCircle2, Flame, Zap, Skull } from "lucide-react";
 import { Navbar } from "@/components/Navbar";
 
 export function Home() {
@@ -16,6 +16,8 @@ export function Home() {
     );
   }
 
+  const LEVEL_TOPICS = ["Intermedio", "Difícil", "Tryhard"];
+
   const topicsMap = exercises?.reduce((acc, ex) => {
     if (!acc[ex.topic]) {
       acc[ex.topic] = [];
@@ -24,12 +26,37 @@ export function Home() {
     return acc;
   }, {} as Record<string, typeof exercises>) || {};
 
-  const topics = Object.entries(topicsMap).map(([name, exs]) => ({
+  const allTopics = Object.entries(topicsMap).map(([name, exs]) => ({
     name,
     exercises: exs.sort((a, b) => a.orderIndex - b.orderIndex),
     total: exs.length,
     completed: progress?.topicProgress?.[name] || 0,
   }));
+
+  const basicTopics = allTopics.filter(t => !LEVEL_TOPICS.includes(t.name));
+  const levelTopics = allTopics.filter(t => LEVEL_TOPICS.includes(t.name))
+    .sort((a, b) => LEVEL_TOPICS.indexOf(a.name) - LEVEL_TOPICS.indexOf(b.name));
+
+  const levelConfig: Record<string, { icon: React.ReactNode; color: string; border: string; badge: string }> = {
+    Intermedio: {
+      icon: <Flame className="w-5 h-5" />,
+      color: "text-yellow-600",
+      border: "border-yellow-200 hover:border-yellow-400",
+      badge: "bg-yellow-100 text-yellow-700",
+    },
+    Difícil: {
+      icon: <Zap className="w-5 h-5" />,
+      color: "text-red-600",
+      border: "border-red-200 hover:border-red-400",
+      badge: "bg-red-100 text-red-700",
+    },
+    Tryhard: {
+      icon: <Skull className="w-5 h-5" />,
+      color: "text-purple-700",
+      border: "border-purple-200 hover:border-purple-500",
+      badge: "bg-purple-100 text-purple-700",
+    },
+  };
 
   const container = {
     hidden: { opacity: 0 },
@@ -133,29 +160,28 @@ export function Home() {
         </div>
       </div>
 
-      {/* Cuadrícula de temas */}
+      {/* ── Temas básicos ── */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
         <div className="flex items-center gap-3 mb-8">
           <Brain className="w-8 h-8 text-primary" />
-          <h2 className="text-3xl font-display font-bold">Elige un tema</h2>
+          <h2 className="text-3xl font-display font-bold">Temas básicos</h2>
         </div>
 
-        <motion.div 
+        <motion.div
           variants={container}
           initial="hidden"
           animate="show"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-          {topics.map((topic) => {
+          {basicTopics.map((topic) => {
             const isCompleted = topic.completed === topic.total;
             const percent = Math.round((topic.completed / topic.total) * 100);
-            
             return (
               <motion.div key={topic.name} variants={item}>
-                <Link 
+                <Link
                   href={`/exercise/${topic.exercises[0]?.id}`}
                   className={`block h-full bg-white rounded-3xl p-6 border-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group
-                    ${isCompleted ? 'border-success/30 hover:border-success/60' : 'border-transparent hover:border-primary/30'}
+                    ${isCompleted ? "border-success/30 hover:border-success/60" : "border-transparent hover:border-primary/30"}
                   `}
                 >
                   <div className="flex justify-between items-start mb-4">
@@ -172,18 +198,96 @@ export function Home() {
                       </div>
                     )}
                   </div>
-                  
                   <div className="mt-8">
                     <div className="flex justify-between text-sm font-bold text-muted-foreground mb-2">
                       <span>{percent}% completado</span>
                       <span>{topic.completed} / {topic.total}</span>
                     </div>
                     <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
-                      <motion.div 
+                      <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: `${percent}%` }}
                         transition={{ duration: 1, ease: "easeOut" }}
-                        className={`h-full rounded-full ${isCompleted ? 'bg-success' : 'bg-primary'}`}
+                        className={`h-full rounded-full ${isCompleted ? "bg-success" : "bg-primary"}`}
+                      />
+                    </div>
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </div>
+
+      {/* ── Niveles de desafío ── */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 pb-4">
+        <div className="flex items-center gap-3 mb-3">
+          <Skull className="w-8 h-8 text-purple-600" />
+          <h2 className="text-3xl font-display font-bold">Niveles de desafío</h2>
+        </div>
+        <p className="text-muted-foreground mb-8 max-w-2xl">
+          Ejercicios más complejos pensados para quienes ya dominan lo básico. Cada nivel sube considerablemente la dificultad.
+        </p>
+
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
+          {levelTopics.map((topic) => {
+            const cfg = levelConfig[topic.name];
+            const isCompleted = topic.completed === topic.total;
+            const percent = Math.round((topic.completed / topic.total) * 100);
+            return (
+              <motion.div key={topic.name} variants={item}>
+                <Link
+                  href={`/exercise/${topic.exercises[0]?.id}`}
+                  className={`block h-full bg-white rounded-3xl p-6 border-2 transition-all duration-300 hover:-translate-y-1 hover:shadow-xl group ${
+                    isCompleted ? "border-success/40 hover:border-success/60" : `border-2 ${cfg?.border ?? "border-transparent"}`
+                  }`}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-2 py-1 rounded-full mb-2 ${cfg?.badge ?? ""}`}>
+                        {cfg?.icon}
+                        {topic.name}
+                      </span>
+                      <h3 className={`text-2xl font-display font-bold transition-colors ${cfg?.color ?? "text-foreground"}`}>
+                        {topic.total} ejercicios
+                      </h3>
+                    </div>
+                    {isCompleted ? (
+                      <div className="w-10 h-10 rounded-full bg-success/10 flex items-center justify-center text-success">
+                        <CheckCircle2 className="w-6 h-6" />
+                      </div>
+                    ) : (
+                      <div className={`w-10 h-10 rounded-full bg-muted flex items-center justify-center transition-colors text-muted-foreground group-hover:text-white ${
+                        topic.name === "Tryhard" ? "group-hover:bg-purple-600"
+                        : topic.name === "Difícil" ? "group-hover:bg-red-500"
+                        : "group-hover:bg-yellow-500"
+                      }`}>
+                        <Play className="w-4 h-4 ml-0.5" />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-6">
+                    <div className="flex justify-between text-sm font-bold text-muted-foreground mb-2">
+                      <span>{percent}% completado</span>
+                      <span>{topic.completed} / {topic.total}</span>
+                    </div>
+                    <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${percent}%` }}
+                        transition={{ duration: 1, ease: "easeOut" }}
+                        className={`h-full rounded-full ${
+                          isCompleted ? "bg-success"
+                          : topic.name === "Tryhard" ? "bg-purple-500"
+                          : topic.name === "Difícil" ? "bg-red-500"
+                          : "bg-yellow-500"
+                        }`}
                       />
                     </div>
                   </div>
