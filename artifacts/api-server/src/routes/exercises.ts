@@ -1190,7 +1190,7 @@ print(total)`,
     type: "predict_output",
     question: `precios = {"manzana": 2, "banana": 1, "cereza": 5}
 for fruta, precio in precios.items():
-    print(f"{fruta}: ${precio}")`,
+    print(f"{fruta}: \${precio}")`,
     hint: ".items() devuelve pares (clave, valor) que se desempaquetan en 'fruta' y 'precio'.",
     explanation: ".items() genera los pares ('manzana', 2), ('banana', 1), ('cereza', 5). En cada iteración, fruta recibe la clave y precio el valor. Se imprime una línea por fruta.",
     correctAnswer: "manzana: $2\nbanana: $1\ncereza: $5",

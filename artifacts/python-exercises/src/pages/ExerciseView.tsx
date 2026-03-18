@@ -11,7 +11,8 @@ import { Navbar } from "@/components/Navbar";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Lightbulb, CheckCircle2, XCircle, ArrowRight, Zap } from "lucide-react";
+import { IntroSlides } from "@/components/IntroSlides";
+import { Lightbulb, CheckCircle2, XCircle, ArrowRight, Zap, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const difficultyLabels: Record<string, string> = {
@@ -45,12 +46,24 @@ export function ExerciseView() {
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [showHint, setShowHint] = useState(false);
   const [result, setResult] = useState<AnswerResult | null>(null);
+  const [showIntro, setShowIntro] = useState(false);
+
+  const BASIC_TOPICS = ["Variables", "Strings", "Listas", "Bucles", "Funciones", "Diccionarios"];
 
   useEffect(() => {
     setSelectedAnswer("");
     setShowHint(false);
     setResult(null);
   }, [id]);
+
+  useEffect(() => {
+    if (!exercise) return;
+    if (!BASIC_TOPICS.includes(exercise.topic)) return;
+    const key = `pylearn_intro_seen_${exercise.topic}`;
+    if (!localStorage.getItem(key)) {
+      setShowIntro(true);
+    }
+  }, [exercise?.topic]);
 
   const handleSubmit = () => {
     if (!selectedAnswer) return;
@@ -93,14 +106,27 @@ export function ExerciseView() {
   const isMultipleChoice = exercise.type === "multiple_choice";
   const hasAnswered = result !== null;
 
+  const handleIntroStart = () => {
+    localStorage.setItem(`pylearn_intro_seen_${exercise.topic}`, "1");
+    setShowIntro(false);
+  };
+
   return (
     <div className="min-h-screen bg-background pb-24">
+      {showIntro && BASIC_TOPICS.includes(exercise.topic) && (
+        <IntroSlides
+          topic={exercise.topic}
+          onClose={handleIntroStart}
+          onStart={handleIntroStart}
+        />
+      )}
+
       <Navbar backTo="/" />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
         {/* Encabezado */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <span className="px-3 py-1 bg-primary/10 text-primary font-bold text-xs rounded-full uppercase tracking-wider">
               {exercise.topic}
             </span>
@@ -110,6 +136,15 @@ export function ExerciseView() {
             )}>
               {difficultyLabels[exercise.difficulty] ?? exercise.difficulty}
             </span>
+            {BASIC_TOPICS.includes(exercise.topic) && (
+              <button
+                onClick={() => setShowIntro(true)}
+                className="flex items-center gap-1.5 px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold text-xs rounded-full transition-colors"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                Ver teoría
+              </button>
+            )}
           </div>
           <span className="text-muted-foreground font-bold text-sm">
             Ejercicio {exercise.orderIndex}

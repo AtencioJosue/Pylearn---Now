@@ -5,7 +5,12 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Home } from "@/pages/Home";
 import { ExerciseView } from "@/pages/ExerciseView";
 import { Playground } from "@/pages/Playground";
+import { Perfil } from "@/pages/Perfil";
+import { Foro } from "@/pages/Foro";
 import NotFound from "@/pages/not-found";
+import { UserProvider } from "@/context/UserContext";
+import { RegisterModal } from "@/components/RegisterModal";
+import { AchievementToast } from "@/components/AchievementToast";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -23,6 +28,8 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/exercise/:id" component={ExerciseView} />
       <Route path="/playground" component={Playground} />
+      <Route path="/perfil" component={Perfil} />
+      <Route path="/foro" component={Foro} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -32,10 +39,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
-          <Router />
-        </WouterRouter>
-        <Toaster />
+        <UserProvider>
+          <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, "")}>
+            <Router />
+          </WouterRouter>
+          <RegisterModal />
+          <AchievementToast />
+          <Toaster />
+        </UserProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
