@@ -4,7 +4,7 @@ import { Bug } from "lucide-react";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen page-bg flex items-center justify-center p-4">
       <div className="text-center max-w-md">
         <div className="w-24 h-24 bg-primary/10 rounded-3xl flex items-center justify-center mx-auto mb-8 animate-bounce">
           <Bug className="w-12 h-12 text-primary" />

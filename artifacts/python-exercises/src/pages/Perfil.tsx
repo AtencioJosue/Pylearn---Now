@@ -1,7 +1,6 @@
 import { useUser, getBuilderRank, getAchievementMeta } from "@/context/UserContext";
 import { Navbar } from "@/components/Navbar";
-import { motion } from "framer-motion";
-import { User, Trophy, Code2, Star, Copy, Check } from "lucide-react";
+import { User, Trophy, Code2, Star, Copy, Check, Flame } from "lucide-react";
 import { useState } from "react";
 import { useGetProgress } from "@workspace/api-client-react";
 
@@ -17,8 +16,8 @@ export function Perfil() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <p className="text-muted-foreground font-medium">Cargando perfil...</p>
+      <div className="min-h-screen page-bg flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-primary"></div>
       </div>
     );
   }
@@ -36,115 +35,141 @@ export function Perfil() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen page-bg pb-20">
       <Navbar />
-      <div className="max-w-3xl mx-auto px-4 py-12">
-        {/* Header del perfil */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-3xl p-8 shadow-sm border border-border/50 mb-6"
-        >
-          <div className="flex items-center gap-6">
-            <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
-              <User className="w-10 h-10" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h1 className="text-3xl font-display font-bold truncate">{user.name}</h1>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-sm font-bold text-muted-foreground">ID:</span>
-                <code className="text-xs bg-muted px-2 py-0.5 rounded font-mono truncate max-w-[200px]">
-                  {user.id}
-                </code>
-                <button onClick={copyId} className="p-1 rounded hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
-                  {copied ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                </button>
-              </div>
-              <div className="flex gap-3 mt-3 flex-wrap">
-                <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold">
-                  <Star className="w-3 h-3 inline mr-1" />{builderRank}
-                </span>
-                <span className="px-3 py-1 rounded-full bg-green-100 text-green-700 text-xs font-bold">
-                  {user.exercisesCreated} ejercicios creados
-                </span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
+      
+      {/* ── Banner Decorativo ── */}
+      <div className="h-40 bg-gradient-to-r from-[#1CB0F6] via-[#58CC02] to-[#1CB0F6] w-full border-b-[6px] border-[#1899D6] relative overflow-hidden">
+         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+         <div className="absolute -bottom-8 left-1/4 w-64 h-64 rounded-full bg-white/10 blur-3xl" />
+         <div className="absolute -top-8 right-1/4 w-48 h-48 rounded-full bg-[#FFC800]/20 blur-3xl" />
+      </div>
 
-        {/* Progreso general */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-3xl p-6 shadow-sm border border-border/50 mb-6"
-        >
-          <div className="flex items-center gap-3 mb-4">
-            <Trophy className="w-6 h-6 text-secondary" />
-            <h2 className="text-xl font-display font-bold">Progreso general</h2>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-[-80px] relative z-10">
+        
+        {/* ── Header del Perfil (Avatar y Racha) ── */}
+        <div className="card-bouncy p-6 md:p-8 mb-8 flex flex-col md:flex-row items-center md:items-start gap-6 relative">
+          
+          {/* Avatar Bouncy */}
+          <div className="w-32 h-32 rounded-3xl bg-[#FFC800] border-4 border-white shadow-lg flex items-center justify-center text-white flex-shrink-0 animate-bounce-slow mt-[-40px]">
+            <img src={`${import.meta.env.BASE_URL}images/python-mascot.png`} alt="Avatar" className="w-24 h-24 object-contain drop-shadow-md" />
           </div>
-          <div className="flex justify-between text-sm font-bold text-muted-foreground mb-2">
-            <span>Ejercicios completados correctamente</span>
-            <span>{correct} / {totalEx}</span>
-          </div>
-          <div className="w-full h-4 bg-muted rounded-full overflow-hidden mb-2">
-            <motion.div
-              initial={{ width: 0 }}
-              animate={{ width: `${percent}%` }}
-              transition={{ duration: 1.2, ease: "easeOut" }}
-              className="h-full rounded-full bg-gradient-to-r from-primary to-secondary"
-            />
-          </div>
-          <p className="text-right text-2xl font-display font-bold text-primary">{percent}%</p>
-        </motion.div>
 
-        {/* Logros */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-3xl p-6 shadow-sm border border-border/50 mb-6"
-        >
-          <div className="flex items-center gap-3 mb-6">
-            <Code2 className="w-6 h-6 text-primary" />
-            <h2 className="text-xl font-display font-bold">Logros</h2>
-            <span className="ml-auto text-sm font-bold text-muted-foreground">
-              {unlockedKeys.size} / {ALL_ACHIEVEMENTS.length}
-            </span>
+          <div className="flex-1 text-center md:text-left">
+            <h1 className="text-4xl font-display font-extrabold text-slate-800 mb-2">{user.name}</h1>
+            
+            <div className="flex items-center justify-center md:justify-start gap-2 mb-4 bg-slate-50 inline-flex px-3 py-1.5 rounded-xl border-2 border-slate-200">
+              <span className="text-sm font-bold text-slate-400 uppercase tracking-wider">ID:</span>
+              <code className="text-sm font-mono text-slate-600 font-bold">{user.id}</code>
+              <button onClick={copyId} className="ml-2 text-slate-400 hover:text-slate-600 transition-colors">
+                {copied ? <Check className="w-5 h-5 text-[#58CC02]" /> : <Copy className="w-5 h-5" />}
+              </button>
+            </div>
+
+            <div className="flex flex-wrap justify-center md:justify-start gap-3">
+              <span className="px-4 py-2 rounded-2xl bg-purple-100 text-purple-700 text-sm font-extrabold uppercase tracking-wide border-b-[3px] border-purple-200 flex items-center">
+                <Star className="w-4 h-4 mr-1.5 fill-current" /> {builderRank}
+              </span>
+              <span className="px-4 py-2 rounded-2xl bg-[#58CC02]/10 text-[#58CC02] text-sm font-extrabold uppercase tracking-wide border-b-[3px] border-[#58CC02]/20">
+                {user.exercisesCreated} ejercicios creados
+              </span>
+            </div>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {ALL_ACHIEVEMENTS.map(key => {
-              const meta = getAchievementMeta(key);
-              const unlocked = unlockedKeys.has(key);
-              const ach = user.achievements.find(a => a.key === key);
-              return (
-                <div
-                  key={key}
-                  className={`flex items-center gap-3 p-3 rounded-2xl border-2 transition-all ${
-                    unlocked
-                      ? "border-yellow-200 bg-yellow-50"
-                      : "border-border/30 bg-muted/30 opacity-50 grayscale"
-                  }`}
-                >
-                  <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 ${
-                    unlocked ? "bg-yellow-100" : "bg-muted"
-                  }`}>
-                    {unlocked ? meta.icon : "🔒"}
-                  </div>
-                  <div>
-                    <p className="font-bold text-sm">{meta.label}</p>
-                    <p className="text-xs text-muted-foreground">{meta.description}</p>
-                    {unlocked && ach?.unlockedAt && (
-                      <p className="text-xs text-yellow-600 font-medium mt-0.5">
-                        {new Date(ach.unlockedAt).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })}
-                      </p>
-                    )}
-                  </div>
+
+          {/* Racha Flotante (Gamificación Simulada) */}
+          <div className="md:absolute md:top-6 md:right-6 bg-[#FF4B4B]/10 border-2 border-[#FF4B4B]/20 rounded-2xl p-4 flex flex-col items-center min-w-[120px]">
+             <Flame className="w-10 h-10 text-[#FF4B4B] mb-1 animate-pulse-soft" fill="currentColor" />
+             <span className="text-2xl font-display font-extrabold text-[#FF4B4B]">3</span>
+             <span className="text-xs uppercase tracking-widest font-bold text-[#FF4B4B]/70">Días seguidos</span>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* ── Columna Izquierda (Estadísticas Rápidas) ── */}
+          <div className="lg:col-span-1 space-y-8">
+            <div className="card-bouncy p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-blue-100 text-[#1CB0F6] rounded-2xl flex items-center justify-center">
+                  <Trophy className="w-6 h-6" />
                 </div>
-              );
-            })}
+                <h2 className="text-xl font-display font-extrabold text-slate-700">Estadísticas</h2>
+              </div>
+
+              <div className="space-y-4">
+                <div className="bg-slate-50 rounded-2xl p-4 border-2 border-slate-100 flex items-center justify-between">
+                   <span className="font-bold text-slate-500">Ejercicios</span>
+                   <span className="font-display font-extrabold text-2xl text-slate-700">{correct}</span>
+                </div>
+                <div className="bg-slate-50 rounded-2xl p-4 border-2 border-slate-100 flex items-center justify-between">
+                   <span className="font-bold text-slate-500">Completado</span>
+                   <span className="font-display font-extrabold text-2xl text-[#58CC02]">{percent}%</span>
+                </div>
+              </div>
+
+              <div className="mt-6 w-full h-4 bg-slate-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-[#58CC02] transition-all duration-1000"
+                  style={{ width: `${percent}%` }}
+                />
+              </div>
+            </div>
           </div>
-        </motion.div>
+
+          {/* ── Columna Derecha (Logros / Medallas) ── */}
+          <div className="lg:col-span-2">
+            <div className="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-slate-200">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-[#FFC800]/20 text-[#FFC800] rounded-2xl flex items-center justify-center">
+                    <Code2 className="w-6 h-6" />
+                  </div>
+                  <h2 className="text-2xl font-display font-extrabold text-slate-700">Tus Logros</h2>
+                </div>
+                <span className="px-4 py-1.5 bg-slate-100 text-slate-500 font-extrabold rounded-xl text-sm">
+                  {unlockedKeys.size} / {ALL_ACHIEVEMENTS.length}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {ALL_ACHIEVEMENTS.map(key => {
+                  const meta = getAchievementMeta(key);
+                  const unlocked = unlockedKeys.has(key);
+                  const ach = user.achievements.find(a => a.key === key);
+                  
+                  return (
+                    <div
+                      key={key}
+                      className={`flex items-start gap-4 p-4 rounded-2xl border-2 transition-all ${
+                        unlocked
+                          ? "border-[#FFC800] bg-[#FFC800]/5 hover:bg-[#FFC800]/10"
+                          : "border-slate-200 bg-slate-50 opacity-60 grayscale"
+                      }`}
+                    >
+                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center text-3xl flex-shrink-0 ${
+                        unlocked ? "bg-[#FFC800]/20 shadow-inner" : "bg-slate-200"
+                      }`}>
+                        {unlocked ? meta.icon : "🔒"}
+                      </div>
+                      <div className="flex-1 mt-1">
+                        <p className={`font-extrabold text-base mb-0.5 ${unlocked ? "text-slate-800" : "text-slate-500"}`}>
+                          {meta.label}
+                        </p>
+                        <p className="text-sm font-bold text-slate-400 leading-tight">{meta.description}</p>
+                        {unlocked && ach?.unlockedAt && (
+                          <div className="inline-block mt-2 px-2 py-0.5 bg-[#FFC800]/20 text-yellow-700 text-xs font-bold rounded-md">
+                            {new Date(ach.unlockedAt).toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+          
+        </div>
       </div>
     </div>
   );

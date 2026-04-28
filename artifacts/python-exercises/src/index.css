@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -52,51 +52,57 @@
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 16px);
 }
 
 :root {
-  /* Bright, friendly, educational color palette */
-  --background: 210 33% 98%; /* Soft blue-gray off-white */
-  --foreground: 222 47% 15%; /* Deep navy text */
+  /* Duolingo-inspired super gamified palette */
+  --background: 0 0% 100%;
+  --foreground: 0 0% 30%; /* Soft dark gray for reading */
   
-  --border: 214 32% 91%;
-  --input: 214 32% 91%;
-  --ring: 221 83% 53%;
+  --border: 0 0% 90%;
+  --input: 0 0% 90%;
+  --ring: 198 90% 54%;
 
   --card: 0 0% 100%;
-  --card-foreground: 222 47% 15%;
-  --card-border: 214 32% 91%;
+  --card-foreground: 0 0% 30%;
+  --card-border: 0 0% 90%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 222 47% 15%;
-  --popover-border: 214 32% 91%;
+  --popover-foreground: 0 0% 30%;
+  --popover-border: 0 0% 90%;
 
-  /* Primary: Vibrant Learning Blue */
-  --primary: 221 83% 53%;
-  --primary-foreground: 210 40% 98%;
+  /* Primary: Bright Sky Blue (#1CB0F6) */
+  --primary: 199 92% 54%;
+  --primary-foreground: 0 0% 100%;
+  --primary-border: #1899D6;
   
-  /* Secondary: Sunny Yellow for joy/accents */
-  --secondary: 45 100% 51%;
-  --secondary-foreground: 222 47% 15%;
+  /* Secondary: Golden Yellow (#FFC800) */
+  --secondary: 47 100% 50%;
+  --secondary-foreground: 0 0% 30%;
+  --secondary-border: #E5B400;
 
-  /* Muted: Soft gray for subtle UI elements */
-  --muted: 210 40% 95%;
-  --muted-foreground: 215 16% 47%;
+  /* Muted: Soft grey background */
+  --muted: 210 20% 96%;
+  --muted-foreground: 0 0% 60%;
+  --muted-border: #E5E5E5;
 
-  /* Accent: Playful Purple */
-  --accent: 262 83% 65%;
-  --accent-foreground: 210 40% 98%;
+  /* Accent: Playful Purple (#CE82FF) */
+  --accent: 276 100% 75%;
+  --accent-foreground: 0 0% 100%;
+  --accent-border: #A568CC;
 
-  /* Destructive: Soft Red */
-  --destructive: 348 83% 58%;
-  --destructive-foreground: 210 40% 98%;
+  /* Destructive: Bright Red (#FF4B4B) */
+  --destructive: 0 100% 65%;
+  --destructive-foreground: 0 0% 100%;
+  --destructive-border: #EA2B2B;
   
-  /* Success: Bright Mint Green */
-  --success: 152 69% 45%;
-  --success-foreground: 210 40% 98%;
+  /* Success: Bright Green (#58CC02) */
+  --success: 94 96% 40%;
+  --success-foreground: 0 0% 100%;
 
-  --app-font-sans: 'Quicksand', sans-serif;
-  --app-font-display: 'Nunito', sans-serif;
+  --app-font-sans: 'Nunito', sans-serif;
+  --app-font-display: 'Quicksand', sans-serif;
   --app-font-mono: 'JetBrains Mono', 'Menlo', monospace;
   
   --radius: 1rem; 
@@ -108,21 +114,88 @@
   }
 
   body {
-    @apply font-sans antialiased bg-background text-foreground;
-    background-image: radial-gradient(hsl(var(--primary) / 0.05) 1px, transparent 1px);
-    background-size: 24px 24px;
+    @apply font-sans antialiased text-foreground;
+    background-color: #eef4f9;
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display);
-    @apply font-bold tracking-tight text-foreground;
+    @apply font-extrabold tracking-tight text-slate-800;
   }
 }
 
-/* Custom scrollbar for a polished look */
+/* ─── Rich themed background for all pages ─── */
+.page-bg {
+  background-color: #eef4f9;
+  background-image:
+    radial-gradient(ellipse 120% 80% at 5% 0%, rgba(28, 176, 246, 0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 70% at 95% 100%, rgba(88, 204, 2, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 90% 60% at 50% 40%, rgba(255, 200, 0, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 80% 50% at 80% 20%, rgba(206, 130, 255, 0.04) 0%, transparent 70%),
+    radial-gradient(ellipse 100% 60% at 20% 80%, rgba(28, 176, 246, 0.03) 0%, transparent 70%);
+  background-attachment: fixed;
+  position: relative;
+}
+
+.page-bg::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    radial-gradient(circle 800px at 15% 25%, rgba(28, 176, 246, 0.04) 0%, transparent 100%),
+    radial-gradient(circle 600px at 85% 75%, rgba(88, 204, 2, 0.04) 0%, transparent 100%),
+    radial-gradient(circle 500px at 50% 5%, rgba(255, 200, 0, 0.03) 0%, transparent 100%),
+    radial-gradient(circle 700px at 70% 50%, rgba(206, 130, 255, 0.025) 0%, transparent 100%);
+}
+
+.page-bg > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Gamified Bounce Utilities */
+.btn-bouncy {
+  @apply relative transition-transform active:translate-y-1 hover:-translate-y-0.5 select-none;
+}
+.btn-blue {
+  @apply bg-[#1CB0F6] text-white border-b-[4px] border-[#1899D6] rounded-2xl hover:bg-[#159FE2];
+}
+.btn-green {
+  @apply bg-[#58CC02] text-white border-b-[4px] border-[#58A700] rounded-2xl hover:bg-[#46A302];
+}
+.btn-yellow {
+  @apply bg-[#FFC800] text-slate-800 border-b-[4px] border-[#E5B400] rounded-2xl hover:bg-[#F0BC00];
+}
+.btn-red {
+  @apply bg-[#FF4B4B] text-white border-b-[4px] border-[#EA2B2B] rounded-2xl hover:bg-[#E23D3D];
+}
+.btn-outline-gray {
+  @apply bg-white text-slate-500 border-2 border-b-[4px] border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-slate-300;
+}
+.card-bouncy {
+  @apply bg-white rounded-3xl border-2 border-b-[6px] border-slate-200 transition-all hover:border-b-[4px] hover:translate-y-[2px] hover:shadow-sm cursor-pointer;
+}
+
+/* Active states for 3D buttons to squish down */
+.btn-bouncy:active {
+  border-bottom-width: 0px !important;
+  transform: translateY(4px);
+  margin-bottom: 4px; /* maintain layout flow */
+}
+.card-bouncy:active {
+  border-bottom-width: 2px !important;
+  transform: translateY(4px);
+}
+
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
@@ -130,18 +203,71 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted-foreground) / 0.3);
-  border-radius: 4px;
+  background: #E5E5E5;
+  border-radius: 10px;
+  border: 2px solid #f7f9fa;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground) / 0.5);
+  background: #CCCCCC;
 }
 
 /* Code block customization */
 .code-block-wrapper pre {
   margin: 0 !important;
-  border-radius: var(--radius-lg);
-  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 16px;
+  border: 2px solid #374151;
+  background: #1f2937 !important;
+  box-shadow: 0 4px 0 #111827;
+}
+
+/* Fun pulsating badge */
+@keyframes pulse-soft {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.animate-pulse-soft {
+  animation: pulse-soft 2s infinite ease-in-out;
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.animate-bounce-slow {
+  animation: bounce-slow 3s infinite ease-in-out;
+}
+
+/* Floating animation for hero particles */
+@keyframes float {
+  0%, 100% { 
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.4;
+  }
+  25% { 
+    transform: translateY(-15px) rotate(5deg);
+    opacity: 0.6;
+  }
+  50% { 
+    transform: translateY(-25px) rotate(-3deg);
+    opacity: 0.5;
+  }
+  75% { 
+    transform: translateY(-10px) rotate(2deg);
+    opacity: 0.7;
+  }
+}
+.animate-float {
+  animation: float 6s infinite ease-in-out;
+}
+
+/* Subtle shimmer for gradient text */
+@keyframes shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.bg-clip-text {
+  background-size: 200% 200%;
+  animation: shimmer 4s ease-in-out infinite;
 }

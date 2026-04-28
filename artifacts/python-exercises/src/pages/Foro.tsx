@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Navbar } from "@/components/Navbar";
 import { useUser } from "@/context/UserContext";
 import { motion } from "framer-motion";
-import { MessageCircle, Plus, X, Image as ImageIcon, Send, ChevronLeft } from "lucide-react";
+import { MessageCircle, Plus, X, Image as ImageIcon, Send, ChevronLeft, Upload, Link2 } from "lucide-react";
 import { Link } from "wouter";
 
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
@@ -141,6 +141,17 @@ export function Foro() {
   const [newContent, setNewContent] = useState("");
   const [newImageUrl, setNewImageUrl] = useState("");
   const [creating, setCreating] = useState(false);
+  const [imageMode, setImageMode] = useState<"file" | "url">("file");
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      setNewImageUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const loadPosts = async () => {
     setLoading(true);
@@ -166,14 +177,14 @@ export function Foro() {
         image_url: newImageUrl.trim() || undefined,
       }),
     });
-    setNewTitle(""); setNewContent(""); setNewImageUrl("");
+    setNewTitle(""); setNewContent(""); setNewImageUrl(""); setImageMode("file");
     setShowCreate(false);
     setCreating(false);
     loadPosts();
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen page-bg" style={{ minHeight: '100dvh' }}>
       <Navbar />
       <div className="max-w-3xl mx-auto px-4 py-12">
         {selectedPost ? (
@@ -281,17 +292,51 @@ export function Foro() {
                 />
               </div>
               <div>
-                <label className="text-sm font-bold mb-1 flex items-center gap-2">
+                <label className="text-sm font-bold mb-2 flex items-center gap-2">
                   <ImageIcon className="w-4 h-4" />
-                  URL de imagen (opcional)
+                  Imagen (opcional)
                 </label>
-                <input
-                  type="url"
-                  value={newImageUrl}
-                  onChange={e => setNewImageUrl(e.target.value)}
-                  placeholder="https://..."
-                  className="w-full px-4 py-2.5 rounded-xl border-2 border-border focus:border-primary outline-none font-medium transition-colors"
-                />
+                <div className="flex gap-1 mb-2">
+                  <button
+                    type="button"
+                    onClick={() => { setImageMode("file"); setNewImageUrl(""); }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                      imageMode === "file" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <Upload className="w-3.5 h-3.5" /> Subir archivo
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setImageMode("url"); setNewImageUrl(""); }}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${
+                      imageMode === "url" ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted"
+                    }`}
+                  >
+                    <Link2 className="w-3.5 h-3.5" /> URL
+                  </button>
+                </div>
+                {imageMode === "file" ? (
+                  <div>
+                    <input
+                      type="file"
+                      accept="image/*,video/*"
+                      onChange={handleFileUpload}
+                      className="w-full text-sm file:mr-3 file:py-2 file:px-4 file:rounded-xl file:border-0 file:bg-primary/10 file:text-primary file:font-bold file:cursor-pointer hover:file:bg-primary/20 transition-colors cursor-pointer"
+                    />
+                    {newImageUrl && newImageUrl.startsWith("data:") && (
+                      <img src={newImageUrl} alt="Vista previa" className="mt-2 max-h-32 rounded-xl border border-border object-contain" />
+                    )}
+                  </div>
+                ) : (
+                  <input
+                    type="url"
+                    value={newImageUrl}
+                    onChange={e => setNewImageUrl(e.target.value)}
+                    placeholder="https://..."
+                    className="w-full px-4 py-2.5 rounded-xl border-2 border-border focus:border-primary outline-none font-medium transition-colors"
+                  />
+                )}
               </div>
               <div className="flex gap-3 justify-end pt-2">
                 <button type="button" onClick={() => setShowCreate(false)} className="px-4 py-2 rounded-xl border-2 border-border font-bold hover:bg-muted transition-colors">

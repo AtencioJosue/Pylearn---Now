@@ -7,6 +7,7 @@ import {
   useCheckAnswer, 
   AnswerResult,
 } from "@workspace/api-client-react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Navbar } from "@/components/Navbar";
 import { CodeBlock } from "@/components/CodeBlock";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ import { Card } from "@/components/ui/card";
 import { IntroSlides } from "@/components/IntroSlides";
 import { Lightbulb, CheckCircle2, XCircle, ArrowRight, Zap, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { playSuccessSound, playErrorSound } from "@/hooks/useSoundEffects";
 
 const difficultyLabels: Record<string, string> = {
   beginner: "Principiante",
@@ -42,6 +44,7 @@ export function ExerciseView() {
   const { data: exercise, isLoading } = useGetExercise(id, { query: { enabled: !!id } });
   const { data: allExercises } = useGetExercises();
   const checkMutation = useCheckAnswer();
+  const queryClient = useQueryClient();
 
   const [selectedAnswer, setSelectedAnswer] = useState<string>("");
   const [showHint, setShowHint] = useState(false);
@@ -70,7 +73,17 @@ export function ExerciseView() {
     checkMutation.mutate(
       { id, data: { answer: selectedAnswer } },
       {
-        onSuccess: (data) => setResult(data)
+        onSuccess: (data) => {
+          setResult(data);
+          // Play sound effect based on result
+          if (data.correct) {
+            playSuccessSound();
+            // Invalidate progress cache so Home page updates
+            queryClient.invalidateQueries({ queryKey: ['/api/progress'] });
+          } else {
+            playErrorSound();
+          }
+        }
       }
     );
   };
@@ -94,7 +107,7 @@ export function ExerciseView() {
 
   if (isLoading || !exercise) {
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen page-bg flex flex-col">
         <Navbar backTo="/" />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
@@ -111,16 +124,23 @@ export function ExerciseView() {
     setShowIntro(false);
   };
 
+  const handleIntroClose = () => {
+    localStorage.setItem(`pylearn_intro_seen_${exercise.topic}`, "1");
+    setShowIntro(false);
+    setLocation("/");
+  };
+
   return (
-    <div className="min-h-screen bg-background pb-24">
+    <>
       {showIntro && BASIC_TOPICS.includes(exercise.topic) && (
         <IntroSlides
           topic={exercise.topic}
-          onClose={handleIntroStart}
+          onClose={handleIntroClose}
           onStart={handleIntroStart}
         />
       )}
 
+    <div className="min-h-screen pb-24 page-bg">
       <Navbar backTo="/" />
 
       <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
@@ -321,5 +341,6 @@ export function ExerciseView() {
         </div>
       </main>
     </div>
+    </>
   );
 }
