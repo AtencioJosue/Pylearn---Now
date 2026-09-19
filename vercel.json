@@ -1,5 +1,5 @@
 {
-  "installCommand": "pnpm install --frozen-lockfile",
+  "installCommand": "pnpm install --frozen-lockfile --prod=false",
   "buildCommand": "pnpm --filter @workspace/python-exercises run build",
   "outputDirectory": "artifacts/python-exercises/dist/public",
   "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
