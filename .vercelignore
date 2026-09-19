@@ -1,0 +1,9 @@
+node_modules
+.local
+.tmp-progress-smoke
+.git
+.vercel
+.env.local
+dist
+**/dist
+*.zip

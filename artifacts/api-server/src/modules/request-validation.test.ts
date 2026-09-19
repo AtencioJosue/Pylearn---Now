@@ -20,9 +20,9 @@ test("rechaza consultas sin usuario e IDs de foro inválidos", async () => {
       body: JSON.stringify({ user_id: "test-user" }),
     });
 
-    assert.equal(progress.status, 400);
-    assert.equal(gamification.status, 400);
-    assert.equal(invalidPost.status, 400);
+    assert.equal(progress.status, 401);
+    assert.equal(gamification.status, 401);
+    assert.equal(invalidPost.status, 401);
   } finally {
     await new Promise<void>((resolve, reject) => {
       server.close((error) => (error ? reject(error) : resolve()));

@@ -25,6 +25,7 @@ import {
   updateRemoteUserProgress,
 } from "../modules/exercises/remote-progress";
 import { getOrCreateUserProgress } from "../modules/exercises/user-progress";
+import { getAuthUser, requireAuth } from "../auth";
 
 export { exercises };
 
@@ -134,7 +135,7 @@ router.get("/exercises", (_req, res) => {
 });
 
 router.get("/exercises/:id", (req, res) => {
-  const id = Number.parseInt(req.params.id ?? "", 10);
+  const id = Number.parseInt(String(req.params.id ?? ""), 10);
   const exercise = exercises.find((item) => item.id === id);
   if (!exercise) {
     res.status(404).json({ message: "Exercise not found" });
@@ -149,8 +150,8 @@ router.get("/exercises/:id", (req, res) => {
   res.json(GetExerciseResponse.parse(exerciseData));
 });
 
-router.post("/exercises/:id/check", async (req, res) => {
-  const id = Number.parseInt(req.params.id ?? "", 10);
+router.post("/exercises/:id/check", requireAuth, async (req, res) => {
+  const id = Number.parseInt(String(req.params.id ?? ""), 10);
   const exercise = exercises.find((item) => item.id === id);
   if (!exercise) {
     res.status(404).json({ message: "Exercise not found" });
@@ -162,7 +163,10 @@ router.post("/exercises/:id/check", async (req, res) => {
     res.status(400).json({ message: "Invalid answer submission" });
     return;
   }
-  const body = parsedBody.data;
+  const body = {
+    ...parsedBody.data,
+    userId: getAuthUser(req).id,
+  };
 
   if (pool) {
     try {
@@ -195,17 +199,8 @@ router.post("/exercises/:id/check", async (req, res) => {
   res.json(data);
 });
 
-router.get("/progress", async (req, res) => {
-  if (typeof req.query.userId !== "string" || !req.query.userId.trim()) {
-    res.status(400).json({ message: "userId is required" });
-    return;
-  }
-  const parsedQuery = GetProgressQueryParams.safeParse(req.query);
-  if (!parsedQuery.success) {
-    res.status(400).json({ message: "userId is required" });
-    return;
-  }
-  const { userId } = parsedQuery.data;
+router.get("/progress", requireAuth, async (req, res) => {
+  const userId = getAuthUser(req).id;
 
   if (pool) {
     try {
@@ -233,17 +228,8 @@ router.get("/progress", async (req, res) => {
   res.json(buildProgressResponse(lookup.progress));
 });
 
-router.get("/gamification/status", async (req, res) => {
-  if (typeof req.query.userId !== "string" || !req.query.userId.trim()) {
-    res.status(400).json({ message: "userId is required" });
-    return;
-  }
-  const parsedQuery = GetGamificationStatusQueryParams.safeParse(req.query);
-  if (!parsedQuery.success) {
-    res.status(400).json({ message: "userId is required" });
-    return;
-  }
-  const { userId } = parsedQuery.data;
+router.get("/gamification/status", requireAuth, async (req, res) => {
+  const userId = getAuthUser(req).id;
 
   if (pool) {
     try {
@@ -271,7 +257,15 @@ router.get("/gamification/status", async (req, res) => {
   res.json(buildGamificationResponse(lookup.progress));
 });
 
-router.post("/gamification/admin/resolve-leagues", async (req, res) => {
+router.post("/gamification/admin/resolve-leagues", requireAuth, async (req, res) => {
+  const adminIds = (process.env.ADMIN_USER_IDS ?? "")
+    .split(",")
+    .map((value) => value.trim())
+    .filter(Boolean);
+  if (!adminIds.includes(getAuthUser(req).id)) {
+    res.status(403).json({ message: "Solo un administrador puede resolver ligas." });
+    return;
+  }
   const currentWeek = req.body?.currentWeek ?? "2026-W19";
   const nextWeek = req.body?.nextWeek ?? "2026-W20";
 

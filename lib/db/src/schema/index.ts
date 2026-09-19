@@ -20,6 +20,42 @@ export const usersTable = pgTable("py_users", {
   passwordHash: text("password_hash"),
   salt: text("salt"),
   avatarUrl: text("avatar_url").default("").notNull(),
+  emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
+  createdAt: createdAt(),
+});
+
+export const sessionsTable = pgTable("py_sessions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: createdAt(),
+});
+
+export const emailVerificationTokensTable = pgTable(
+  "py_email_verification_tokens",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => usersTable.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull().unique(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    attempts: integer("attempts").default(0).notNull(),
+    createdAt: createdAt(),
+  },
+);
+
+export const passwordResetTokensTable = pgTable("py_password_reset_tokens", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => usersTable.id, { onDelete: "cascade" }),
+  tokenHash: text("token_hash").notNull().unique(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  attempts: integer("attempts").default(0).notNull(),
   createdAt: createdAt(),
 });
 
@@ -149,6 +185,9 @@ export const insertUserProgressSchema = createInsertSchema(userProgressTable);
 
 export type User = typeof usersTable.$inferSelect;
 export type InsertUser = typeof usersTable.$inferInsert;
+export type Session = typeof sessionsTable.$inferSelect;
+export type EmailVerificationToken = typeof emailVerificationTokensTable.$inferSelect;
+export type PasswordResetToken = typeof passwordResetTokensTable.$inferSelect;
 export type Achievement = typeof achievementsTable.$inferSelect;
 export type InsertAchievement = typeof achievementsTable.$inferInsert;
 export type CreatedExercise = typeof createdExercisesTable.$inferSelect;

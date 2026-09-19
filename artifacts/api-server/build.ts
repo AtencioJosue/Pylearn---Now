@@ -1,7 +1,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import { build as esbuild } from "esbuild";
-import { rm, readFile } from "fs/promises";
+import { copyFile, rm, readFile } from "fs/promises";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -55,7 +55,12 @@ async function buildAll() {
   );
 
   await esbuild({
-    entryPoints: [path.resolve(__dirname, "src/index.ts")],
+    entryPoints: [
+      path.resolve(
+        __dirname,
+        process.env.VERCEL_SERVERLESS === "1" ? "src/vercel.ts" : "src/index.ts",
+      ),
+    ],
     platform: "node",
     bundle: true,
     format: "cjs",
@@ -68,6 +73,13 @@ async function buildAll() {
     external: externals,
     logLevel: "info",
   });
+
+  if (process.env.VERCEL_SERVERLESS === "1") {
+    await copyFile(
+      path.resolve(__dirname, "local_db.json"),
+      path.resolve(distDir, "local_db.json"),
+    );
+  }
 }
 
 buildAll().catch((err) => {

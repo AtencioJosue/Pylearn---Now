@@ -1,12 +1,46 @@
 import { Router, IRouter } from "express";
+import crypto from "crypto";
 import { localDB } from "../local_db";
 import { pool } from "../database";
+import { getAuthUser, requireAuth } from "../auth";
+import { storeImage } from "../storage";
 
 const router: IRouter = Router();
 
 function parseResourceId(value: string): number | null {
   const id = Number(value);
   return Number.isSafeInteger(id) && id > 0 ? id : null;
+}
+
+async function persistPostImage(value: unknown, userId: string) {
+  if (typeof value !== "string" || !value.trim()) return null;
+  const raw = value.trim();
+  if (!raw.startsWith("data:")) {
+    return /^https?:\/\//i.test(raw) ? raw.slice(0, 2048) : null;
+  }
+  if (process.env.VERCEL === "1" && !process.env.BLOB_READ_WRITE_TOKEN) {
+    const error = new Error("El almacenamiento de imágenes aún no está configurado.") as Error & { status?: number };
+    error.status = 503;
+    throw error;
+  }
+  const matches = raw.match(/^data:([^;]+);base64,(.+)$/);
+  if (!matches) throw new Error("La imagen del post no es válida.");
+  const contentType = matches[1].toLowerCase();
+  const extensionByType: Record<string, string> = {
+    "image/png": "png",
+    "image/jpeg": "jpg",
+    "image/jpg": "jpg",
+    "image/webp": "webp",
+  };
+  const extension = extensionByType[contentType];
+  if (!extension) throw new Error("Solo se permiten imágenes PNG, JPG o WEBP.");
+  const buffer = Buffer.from(matches[2], "base64");
+  if (buffer.length === 0 || buffer.length > 2 * 1024 * 1024) {
+    throw new Error("La imagen debe pesar como máximo 2MB.");
+  }
+  const filename = `${crypto.createHash("sha256").update(userId).digest("hex").slice(0, 24)}_post_${Date.now()}.${extension}`;
+  const stored = await storeImage(filename, buffer, contentType, "posts");
+  return stored.url;
 }
 
 // ─── GET /posts ───────────────────────────────────────────────────────────────
@@ -41,10 +75,20 @@ router.get("/posts", async (_req, res) => {
 });
 
 // ─── POST /posts ──────────────────────────────────────────────────────────────
-router.post("/posts", async (req, res) => {
-  const { user_id, author_name, title, content, image_url } = req.body;
-  if (!user_id || !author_name || !title || !content)
+router.post("/posts", requireAuth, async (req, res) => {
+  const user = getAuthUser(req);
+  const { title, content, image_url } = req.body;
+  const user_id = user.id;
+  const author_name = user.name;
+  if (!title || !content)
     return res.status(400).json({ error: "Faltan campos requeridos" });
+
+  let storedImageUrl: string | null;
+  try {
+    storedImageUrl = await persistPostImage(image_url, user_id);
+  } catch (error: any) {
+    return res.status(error.status ?? 400).json({ error: error.message });
+  }
 
   if (!pool) {
     const db = localDB.get();
@@ -64,7 +108,7 @@ router.post("/posts", async (req, res) => {
       author_name,
       title,
       content,
-      image_url: image_url ?? null,
+      image_url: storedImageUrl,
       created_at: new Date().toISOString(),
       comment_count: 0,
       likes_count: 0,
@@ -81,7 +125,7 @@ router.post("/posts", async (req, res) => {
       `INSERT INTO py_forum_posts (user_id, author_name, title, content, image_url)
        VALUES ($1, $2, $3, $4, $5)
        RETURNING *, ARRAY[]::text[] AS liked_by`,
-      [user_id, author_name, title, content, image_url ?? null],
+      [user_id, author_name, title, content, storedImageUrl],
     );
     return res.json(result.rows[0]);
   } catch (e: any) {
@@ -91,7 +135,7 @@ router.post("/posts", async (req, res) => {
 
 // ─── GET /posts/:id ───────────────────────────────────────────────────────────
 router.get("/posts/:id", async (req, res) => {
-  const id = parseResourceId(req.params.id);
+  const id = parseResourceId(String(req.params.id));
   if (id === null)
     return res.status(400).json({ error: "ID de post inválido" });
 
@@ -138,12 +182,15 @@ router.get("/posts/:id", async (req, res) => {
 });
 
 // ─── POST /posts/:id/comments ─────────────────────────────────────────────────
-router.post("/posts/:id/comments", async (req, res) => {
-  const id = parseResourceId(req.params.id);
+router.post("/posts/:id/comments", requireAuth, async (req, res) => {
+  const id = parseResourceId(String(req.params.id));
   if (id === null)
     return res.status(400).json({ error: "ID de post inválido" });
-  const { user_id, author_name, content } = req.body;
-  if (!user_id || !author_name || !content)
+  const user = getAuthUser(req);
+  const { content } = req.body;
+  const user_id = user.id;
+  const author_name = user.name;
+  if (!content)
     return res.status(400).json({ error: "Faltan campos requeridos" });
 
   if (!pool) {
@@ -202,12 +249,11 @@ router.post("/posts/:id/comments", async (req, res) => {
 });
 
 // ─── POST /posts/:id/like ─────────────────────────────────────────────────────
-router.post("/posts/:id/like", async (req, res) => {
-  const id = parseResourceId(req.params.id);
+router.post("/posts/:id/like", requireAuth, async (req, res) => {
+  const id = parseResourceId(String(req.params.id));
   if (id === null)
     return res.status(400).json({ error: "ID de post inválido" });
-  const { user_id } = req.body;
-  if (!user_id) return res.status(400).json({ error: "user_id requerido" });
+  const user_id = getAuthUser(req).id;
 
   if (!pool) {
     const db = localDB.get();
@@ -250,12 +296,11 @@ router.post("/posts/:id/like", async (req, res) => {
 });
 
 // ─── POST /comments/:id/like ──────────────────────────────────────────────────
-router.post("/comments/:id/like", async (req, res) => {
-  const id = parseResourceId(req.params.id);
+router.post("/comments/:id/like", requireAuth, async (req, res) => {
+  const id = parseResourceId(String(req.params.id));
   if (id === null)
     return res.status(400).json({ error: "ID de comentario inválido" });
-  const { user_id } = req.body;
-  if (!user_id) return res.status(400).json({ error: "user_id requerido" });
+  const user_id = getAuthUser(req).id;
 
   if (!pool) {
     const db = localDB.get();

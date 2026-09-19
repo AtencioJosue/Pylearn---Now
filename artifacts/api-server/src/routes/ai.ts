@@ -1,5 +1,6 @@
 import { Router, IRouter, Request, Response } from "express";
 import OpenAI from "openai";
+import { requireAuth } from "../auth";
 
 const router: IRouter = Router();
 
@@ -312,7 +313,7 @@ function getMockResponse(
 }
 
 // ── POST /api/ai/coach ──
-router.post("/coach", async (req: Request, res: Response) => {
+router.post("/coach", requireAuth, async (req: Request, res: Response) => {
   const {
     exerciseId,
     exerciseTitle,

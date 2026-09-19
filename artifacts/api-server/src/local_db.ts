@@ -2,6 +2,8 @@ import fs from "fs";
 import path from "path";
 
 function resolveDbPath(): string {
+  const bundledPath = path.join(import.meta.dirname, "local_db.json");
+  if (fs.existsSync(bundledPath)) return bundledPath;
   const cwdPath = path.join(process.cwd(), "local_db.json");
   if (fs.existsSync(cwdPath)) return cwdPath;
   const packagePath = path.resolve(import.meta.dirname, "../local_db.json");
@@ -32,6 +34,9 @@ export interface UserProgress {
 
 export interface LocalDB {
   users: Record<string, any>;
+  sessions?: Record<string, any>;
+  emailVerificationTokens?: Record<string, any>;
+  passwordResetTokens?: Record<string, any>;
   achievements: Record<string, any[]>;
   answers: Record<string, AnswerRecord>;
   posts: any[];
@@ -58,6 +63,9 @@ function loadDB(): LocalDB {
   }
   return {
     users: {},
+    sessions: {},
+    emailVerificationTokens: {},
+    passwordResetTokens: {},
     achievements: {},
     answers: {},
     posts: [],

@@ -1,4 +1,12 @@
-import { createContext, useContext, useState, useEffect, useCallback, useRef, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 export interface Achievement {
   key: string;
@@ -18,13 +26,22 @@ export interface User {
   exercisesCreated: number;
 }
 
+export interface AuthActionResult {
+  debugCode?: string;
+  message?: string;
+}
+
 interface UserContextValue {
   user: User | null;
   isRegistered: boolean;
   showRegister: boolean;
-  setShowRegister: (v: boolean) => void;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  setShowRegister: (value: boolean) => void;
+  register: (name: string, email: string, password: string) => Promise<AuthActionResult>;
+  verifyEmail: (email: string, code: string) => Promise<void>;
+  resendVerification: (email: string) => Promise<AuthActionResult>;
   login: (email: string, password: string) => Promise<void>;
+  requestPasswordReset: (email: string) => Promise<AuthActionResult>;
+  resetPassword: (email: string, code: string, password: string) => Promise<AuthActionResult>;
   logout: () => void;
   updateProfile: (name: string, avatar_url?: string) => Promise<void>;
   uploadAvatar: (base64Data: string) => Promise<void>;
@@ -49,7 +66,12 @@ const ACHIEVEMENT_CATALOG: Omit<Achievement, "unlockedAt">[] = [
 ];
 
 export function getAchievementMeta(key: string) {
-  return ACHIEVEMENT_CATALOG.find(a => a.key === key) ?? { key, label: key, description: "", icon: "🏅" };
+  return ACHIEVEMENT_CATALOG.find((item) => item.key === key) ?? {
+    key,
+    label: key,
+    description: "",
+    icon: "🏅",
+  };
 }
 
 export function getBuilderRank(exercisesCreated: number): string {
@@ -63,6 +85,37 @@ export function getBuilderRank(exercisesCreated: number): string {
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 const api = (path: string) => `${BASE}/api${path}`;
 
+async function readResponse(response: Response) {
+  try {
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
+function toUser(data: any): User {
+  return {
+    id: data.id,
+    name: data.name,
+    email: data.email || "",
+    avatar_url: data.avatar_url || "",
+    created_at: data.created_at || "",
+    achievements: (data.achievements ?? []).map(
+      (achievement: { key: string; unlocked_at?: string }) => ({
+        ...getAchievementMeta(achievement.key),
+        unlockedAt: achievement.unlocked_at,
+      }),
+    ),
+    exercisesCreated: data.exercisesCreated ?? 0,
+  };
+}
+
+function apiError(data: any, fallback: string) {
+  return typeof data?.error === "string" && data.error.trim()
+    ? data.error
+    : fallback;
+}
+
 export function UserProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [showRegister, setShowRegister] = useState(false);
@@ -71,57 +124,29 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const isRegistered = !!user;
 
-  const fetchUser = useCallback(async (id: string) => {
-    const res = await fetch(api(`/users/${id}`));
-    if (res.status === 404) return null;
-    if (!res.ok)
-      throw new Error(`No se pudo cargar el usuario (${res.status}).`);
-    const data = await res.json();
-    const achievements: Achievement[] = (data.achievements ?? []).map(
-      (a: { key: string; unlocked_at: string }) => ({
-        ...getAchievementMeta(a.key),
-        unlockedAt: a.unlocked_at,
-      }),
-    );
-    return {
-      id: data.id,
-      name: data.name,
-      email: data.email || "",
-      avatar_url: data.avatar_url || "",
-      created_at: data.created_at || "",
-      achievements,
-      exercisesCreated: data.exercisesCreated ?? 0,
-    } as User;
+  const fetchUser = useCallback(async () => {
+    const response = await fetch(api("/users/me"), { credentials: "include" });
+    if (response.status === 401) return null;
+    const data = await readResponse(response);
+    if (!response.ok) throw new Error(apiError(data, "No se pudo cargar tu cuenta."));
+    return toUser(data);
   }, []);
 
   useEffect(() => {
-    const storedId = localStorage.getItem("pylearn_user_id");
-    if (!storedId) {
-      setShowRegister(true);
-      return;
-    }
-
     let active = true;
     let retryTimer: number | undefined;
-    const loadStoredUser = async () => {
+    const loadSession = async () => {
       try {
-        const storedUser = await fetchUser(storedId);
+        const currentUser = await fetchUser();
         if (!active) return;
-        if (storedUser) {
-          setUser(storedUser);
-          setShowRegister(false);
-        } else {
-          localStorage.removeItem("pylearn_user_id");
-          setShowRegister(true);
-        }
+        setUser(currentUser);
+        setShowRegister(!currentUser);
       } catch {
         if (!active) return;
-        setShowRegister(false);
-        retryTimer = window.setTimeout(loadStoredUser, 3000);
+        retryTimer = window.setTimeout(loadSession, 3000);
       }
     };
-
-    void loadStoredUser();
+    void loadSession();
     return () => {
       active = false;
       if (retryTimer !== undefined) window.clearTimeout(retryTimer);
@@ -129,94 +154,93 @@ export function UserProvider({ children }: { children: ReactNode }) {
   }, [fetchUser]);
 
   const register = useCallback(async (name: string, email: string, password: string) => {
-    let res: Response;
+    let response: Response;
     try {
-      res = await fetch(api("/users/register"), {
+      response = await fetch(api("/users/register"), {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
       });
     } catch {
-      throw new Error("No se pudo conectar con el servidor backend (puerto 3001). Asegúrate de que esté en ejecución.");
+      throw new Error("No se pudo conectar con el servidor.");
     }
+    const data = await readResponse(response);
+    if (!response.ok) throw new Error(apiError(data, "No se pudo crear la cuenta."));
+    return { debugCode: data?.debug_code };
+  }, []);
 
-    let data: any = null;
-    try {
-      data = await res.json();
-    } catch {
-      // Non-JSON response (e.g. proxy error or gateway timeout)
-    }
-
-    if (!res.ok) {
-      throw new Error(data?.error || `Error del servidor (${res.status}). No se pudo registrar el usuario.`);
-    }
-
-    if (!data || !data.id) {
-      throw new Error("Respuesta inesperada del servidor al registrar.");
-    }
-
-    const id = data.id;
-
-    localStorage.setItem("pylearn_user_id", id);
-    const registeredAchievement: Achievement = {
-      ...getAchievementMeta("registered"),
-      unlockedAt: data.created_at || new Date().toISOString(),
-    };
-    const newUser: User = {
-      id,
-      name,
-      email,
-      avatar_url: "",
-      created_at: data.created_at || new Date().toISOString(),
-      achievements: [registeredAchievement],
-      exercisesCreated: 0,
-    };
-
-    setUser(newUser);
+  const verifyEmail = useCallback(async (email: string, code: string) => {
+    const response = await fetch(api("/users/verify-email"), {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
+    });
+    const data = await readResponse(response);
+    if (!response.ok) throw new Error(apiError(data, "El código no es válido."));
+    setUser(toUser(data.user));
     setShowRegister(false);
+  }, []);
 
-    setPendingAchievement(registeredAchievement);
+  const resendVerification = useCallback(async (email: string) => {
+    const response = await fetch(api("/users/resend-verification"), {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await readResponse(response);
+    if (!response.ok) throw new Error(apiError(data, "No se pudo reenviar el código."));
+    return { debugCode: data?.debug_code };
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    let res: Response;
-    try {
-      res = await fetch(api("/users/login"), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-    } catch {
-      throw new Error("No se pudo conectar con el servidor backend (puerto 3001). Asegúrate de que esté en ejecución.");
+    const response = await fetch(api("/users/login"), {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await readResponse(response);
+    if (!response.ok) {
+      const error = new Error(apiError(data, "Credenciales incorrectas.")) as Error & { code?: string };
+      error.code = data?.code;
+      throw error;
     }
+    setUser(toUser(data.user));
+    setShowRegister(false);
+  }, []);
 
-    let data: any = null;
-    try {
-      data = await res.json();
-    } catch {
-      // Non-JSON response
-    }
+  const requestPasswordReset = useCallback(async (email: string) => {
+    const response = await fetch(api("/users/forgot-password"), {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await readResponse(response);
+    if (!response.ok) throw new Error(apiError(data, "No se pudo solicitar la recuperación."));
+    return { debugCode: data?.debug_code, message: data?.message };
+  }, []);
 
-    if (!res.ok) {
-      throw new Error(data?.error || "Credenciales incorrectas o error en el servidor.");
-    }
-
-    if (!data || !data.id) {
-      throw new Error("Respuesta inesperada del servidor al iniciar sesión.");
-    }
-
-    localStorage.setItem("pylearn_user_id", data.id);
-
-    // Refresh fully with achievements
-    const fullUser = await fetchUser(data.id);
-    if (fullUser) {
-      setUser(fullUser);
-      setShowRegister(false);
-    }
-  }, [fetchUser]);
+  const resetPassword = useCallback(async (email: string, code: string, password: string) => {
+    const response = await fetch(api("/users/reset-password"), {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code, password }),
+    });
+    const data = await readResponse(response);
+    if (!response.ok) throw new Error(apiError(data, "No se pudo cambiar la contraseña."));
+    return { message: data?.message };
+  }, []);
 
   const logout = useCallback(() => {
-    localStorage.removeItem("pylearn_user_id");
+    void fetch(api("/users/logout"), {
+      method: "POST",
+      credentials: "include",
+    });
     achievementRequests.current.clear();
     setUser(null);
     setShowRegister(true);
@@ -224,110 +248,81 @@ export function UserProvider({ children }: { children: ReactNode }) {
 
   const updateProfile = useCallback(async (name: string, avatar_url?: string) => {
     if (!user) return;
-    let res: Response;
-    try {
-      res = await fetch(api(`/users/${user.id}`), {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, avatar_url }),
-      });
-    } catch {
-      throw new Error("No se pudo conectar con el servidor para actualizar perfil.");
-    }
-
-    let updated: any = null;
-    try {
-      updated = await res.json();
-    } catch {
-      // Non-JSON response
-    }
-
-    if (!res.ok) {
-      throw new Error(updated?.error || "No se pudo actualizar el perfil");
-    }
-
-    if (updated) {
-      setUser(prev => prev ? { ...prev, name: updated.name, avatar_url: updated.avatar_url } : null);
-    }
+    const response = await fetch(api(`/users/${user.id}`), {
+      method: "PUT",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, avatar_url }),
+    });
+    const data = await readResponse(response);
+    if (!response.ok) throw new Error(apiError(data, "No se pudo actualizar el perfil."));
+    setUser((previous) => previous ? { ...previous, name: data.name, avatar_url: data.avatar_url } : null);
   }, [user]);
 
   const uploadAvatar = useCallback(async (base64Data: string) => {
     if (!user) return;
-    let res: Response;
-    try {
-      res = await fetch(api(`/users/${user.id}/avatar`), {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ avatar_data: base64Data }),
-      });
-    } catch {
-      throw new Error("No se pudo conectar con el servidor para subir avatar.");
-    }
-
-    let data: any = null;
-    try {
-      data = await res.json();
-    } catch {
-      // Non-JSON response
-    }
-
-    if (!res.ok) {
-      throw new Error(data?.error || "No se pudo subir la foto de perfil");
-    }
-
-    if (data?.avatar_url) {
-      setUser(prev => prev ? { ...prev, avatar_url: data.avatar_url } : null);
-    }
+    const response = await fetch(api(`/users/${user.id}/avatar`), {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ avatar_data: base64Data }),
+    });
+    const data = await readResponse(response);
+    if (!response.ok) throw new Error(apiError(data, "No se pudo subir la foto."));
+    if (data?.avatar_url) setUser((previous) => previous ? { ...previous, avatar_url: data.avatar_url } : null);
   }, [user]);
 
   const refreshUser = useCallback(async () => {
-    const id = localStorage.getItem("pylearn_user_id");
-    if (!id) return;
-    const u = await fetchUser(id);
-    if (u) setUser(u);
+    const currentUser = await fetchUser();
+    if (currentUser) setUser(currentUser);
   }, [fetchUser]);
 
   const unlockAchievement = useCallback(async (key: string) => {
-    const id = localStorage.getItem("pylearn_user_id");
-    if (!id || !user) return;
-    const alreadyHas = user.achievements.some(a => a.key === key);
+    if (!user) return;
+    const alreadyHas = user.achievements.some((achievement) => achievement.key === key);
     if (alreadyHas || achievementRequests.current.has(key)) return;
-
     achievementRequests.current.add(key);
     try {
-      const res = await fetch(api(`/users/${id}/achievements`), {
+      const response = await fetch(api(`/users/${user.id}/achievements`), {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ key }),
       });
-      if (!res.ok) return;
-
-      const meta = getAchievementMeta(key);
-      const newAch: Achievement = {
-        ...meta,
+      if (!response.ok) return;
+      const newAchievement: Achievement = {
+        ...getAchievementMeta(key),
         unlockedAt: new Date().toISOString(),
       };
-      setUser(prev => {
-        if (!prev || prev.id !== id || prev.achievements.some(a => a.key === key))
-          return prev;
-        return { ...prev, achievements: [...prev.achievements, newAch] };
+      setUser((previous) => {
+        if (!previous || previous.achievements.some((item) => item.key === key)) return previous;
+        return { ...previous, achievements: [...previous.achievements, newAchievement] };
       });
-      setPendingAchievement(newAch);
-    } catch {
-      // Achievement unlocks are retried the next time progress is refreshed.
+      setPendingAchievement(newAchievement);
     } finally {
       achievementRequests.current.delete(key);
     }
   }, [user]);
 
-  const clearPendingAchievement = useCallback(() => setPendingAchievement(null), []);
-
   return (
     <UserContext.Provider value={{
-      user, isRegistered, showRegister, setShowRegister,
-      register, login, logout, updateProfile, uploadAvatar,
-      refreshUser, unlockAchievement,
-      pendingAchievement, clearPendingAchievement,
+      user,
+      isRegistered,
+      showRegister,
+      setShowRegister,
+      register,
+      verifyEmail,
+      resendVerification,
+      login,
+      requestPasswordReset,
+      resetPassword,
+      logout,
+      updateProfile,
+      uploadAvatar,
+      refreshUser,
+      unlockAchievement,
+      pendingAchievement,
+      clearPendingAchievement: () => setPendingAchievement(null),
     }}>
       {children}
     </UserContext.Provider>
@@ -335,7 +330,7 @@ export function UserProvider({ children }: { children: ReactNode }) {
 }
 
 export function useUser() {
-  const ctx = useContext(UserContext);
-  if (!ctx) throw new Error("useUser must be used within UserProvider");
-  return ctx;
+  const context = useContext(UserContext);
+  if (!context) throw new Error("useUser must be used within UserProvider");
+  return context;
 }

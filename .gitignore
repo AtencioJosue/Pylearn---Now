@@ -55,3 +55,8 @@ uploads/
 *.env
 migrate-supabase.mjs
 
+
+.vercel
+.env*
+!.env.example
+!artifacts/api-server/.env.example

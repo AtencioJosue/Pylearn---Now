@@ -2,6 +2,7 @@ import { Router, IRouter } from "express";
 import OpenAI from "openai";
 import { localDB } from "../local_db";
 import { pool } from "../database";
+import { getAuthenticatedUser, getAuthUser, requireAuth } from "../auth";
 
 const router: IRouter = Router();
 const aiApiKey =
@@ -29,7 +30,13 @@ function localValidation(title: string, question: string) {
 }
 
 router.get("/", async (req, res) => {
-  const { user_id } = req.query;
+  const requestedUserId =
+    typeof req.query.user_id === "string" ? req.query.user_id : "";
+  const currentUser = requestedUserId ? await getAuthenticatedUser(req) : null;
+  if (requestedUserId && !currentUser) {
+    return res.status(401).json({ error: "Debes iniciar sesión." });
+  }
+  const user_id = requestedUserId ? currentUser!.id : "";
 
   if (!pool) {
     const db = localDB.get();
@@ -56,10 +63,9 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", requireAuth, async (req, res) => {
+  const user = getAuthUser(req);
   const {
-    user_id,
-    author_name,
     title,
     topic,
     type,
@@ -69,8 +75,6 @@ router.post("/", async (req, res) => {
     explanation,
   } = req.body;
   if (
-    !user_id ||
-    !author_name ||
     !title ||
     !topic ||
     !type ||
@@ -78,6 +82,15 @@ router.post("/", async (req, res) => {
     !correct_answer
   )
     return res.status(400).json({ error: "Faltan campos requeridos" });
+
+  const user_id = user.id;
+  const author_name = user.name;
+
+  if (process.env.VERCEL === "1" && !pool) {
+    return res.status(503).json({
+      error: "La base de datos de producción aún no está configurada.",
+    });
+  }
 
   const validationPrompt = `Eres un evaluador de ejercicios educativos de Python para estudiantes latinoamericanos.
 
