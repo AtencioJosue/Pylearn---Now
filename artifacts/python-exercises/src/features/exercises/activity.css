@@ -1,0 +1,117 @@
+/* Input controls for extended exercises, scoped to the original exercise panel. */
+.legacy-extra-activity .exercise-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px;
+  border: 2px solid var(--linea-conexion);
+  border-radius: 12px;
+  background: var(--bg-tarjetas);
+  color: var(--texto-principal);
+  text-align: left;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.legacy-extra-activity .exercise-option-selected {
+  border-color: var(--color-marca-azul);
+  background: hsl(var(--primary) / 0.08);
+}
+.legacy-extra-activity .exercise-option-correct {
+  border-color: var(--color-marca-verde);
+}
+.legacy-extra-activity .exercise-option-wrong {
+  border-color: var(--color-fuego);
+}
+.legacy-extra-activity .multi-check {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  flex: none;
+  border: 1px solid var(--linea-conexion);
+  border-radius: 5px;
+}
+.legacy-extra-activity .multi-check-selected {
+  color: white;
+  background: var(--color-marca-azul);
+  border-color: var(--color-marca-azul);
+}
+.legacy-extra-activity .order-line {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid var(--linea-conexion);
+  border-radius: 10px;
+  background: var(--bg-tarjetas);
+  color: var(--texto-principal);
+}
+.legacy-extra-activity .order-line code {
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+}
+.legacy-extra-activity .order-number {
+  font-size: 10px;
+  opacity: 0.65;
+}
+.legacy-extra-activity .order-line button {
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  min-height: 32px;
+  border-radius: 6px;
+  background: var(--bg-general);
+}
+.legacy-extra-activity .order-line button svg {
+  width: 16px;
+  height: 16px;
+}
+.legacy-extra-activity button:disabled {
+  cursor: default;
+  opacity: 0.65;
+}
+.legacy-extra-activity .order-line-correct {
+  border-color: var(--color-marca-verde);
+}
+.legacy-extra-activity .order-line-wrong {
+  border-color: var(--color-fuego);
+}
+.legacy-extra-activity .answer-editor {
+  border: 2px solid var(--linea-conexion);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.legacy-extra-activity .answer-editor-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--bg-general);
+  font-size: 11px;
+  color: var(--texto-principal);
+  border-bottom: 1px solid var(--linea-conexion);
+}
+.legacy-extra-activity .answer-editor textarea {
+  display: block;
+  width: 100%;
+  min-height: 190px;
+  padding: 14px;
+  background: var(--bg-tarjetas);
+  color: var(--texto-principal);
+  font-family: var(--app-font-mono);
+  font-size: 13px;
+  resize: vertical;
+}
+.legacy-extra-activity :is(button, textarea):focus-visible {
+  outline: 2px solid var(--color-marca-azul);
+  outline-offset: 2px;
+}
+.legacy-extra-activity .answer-editor-correct {
+  border-color: var(--color-marca-verde);
+}
+.legacy-extra-activity .answer-editor-wrong {
+  border-color: var(--color-fuego);
+}

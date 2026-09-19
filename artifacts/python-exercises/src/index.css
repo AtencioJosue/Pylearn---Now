@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Quicksand:wght@500;600;700;800&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 @plugin "@tailwindcss/typography";
@@ -39,7 +39,7 @@
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-destructive-border: var(--destructive-border);
-  
+
   --color-success: hsl(var(--success));
   --color-success-foreground: hsl(var(--success-foreground));
 
@@ -57,88 +57,216 @@
 
 :root {
   /* Duolingo-inspired super gamified palette */
-  --background: 0 0% 100%;
-  --foreground: 0 0% 30%; /* Soft dark gray for reading */
-  
+  --background: 210 20% 98%;
+  --foreground: 210 20% 25%;
+
   --border: 0 0% 90%;
   --input: 0 0% 90%;
   --ring: 198 90% 54%;
 
   --card: 0 0% 100%;
-  --card-foreground: 0 0% 30%;
+  --card-foreground: 0 0% 25%;
   --card-border: 0 0% 90%;
 
   --popover: 0 0% 100%;
-  --popover-foreground: 0 0% 30%;
+  --popover-foreground: 0 0% 25%;
   --popover-border: 0 0% 90%;
 
   /* Primary: Bright Sky Blue (#1CB0F6) */
   --primary: 199 92% 54%;
   --primary-foreground: 0 0% 100%;
-  --primary-border: #1899D6;
-  
+  --primary-border: #1899d6;
+
   /* Secondary: Golden Yellow (#FFC800) */
   --secondary: 47 100% 50%;
   --secondary-foreground: 0 0% 30%;
-  --secondary-border: #E5B400;
+  --secondary-border: #e5b400;
 
   /* Muted: Soft grey background */
   --muted: 210 20% 96%;
   --muted-foreground: 0 0% 60%;
-  --muted-border: #E5E5E5;
+  --muted-border: #e5e5e5;
 
   /* Accent: Playful Purple (#CE82FF) */
   --accent: 276 100% 75%;
   --accent-foreground: 0 0% 100%;
-  --accent-border: #A568CC;
+  --accent-border: #a568cc;
 
   /* Destructive: Bright Red (#FF4B4B) */
   --destructive: 0 100% 65%;
   --destructive-foreground: 0 0% 100%;
-  --destructive-border: #EA2B2B;
-  
+  --destructive-border: #ea2b2b;
+
   /* Success: Bright Green (#58CC02) */
   --success: 94 96% 40%;
   --success-foreground: 0 0% 100%;
 
-  --app-font-sans: 'Nunito', sans-serif;
-  --app-font-display: 'Quicksand', sans-serif;
-  --app-font-mono: 'JetBrains Mono', 'Menlo', monospace;
-  
-  --radius: 1rem; 
+  --app-font-sans: "Nunito", sans-serif;
+  --app-font-display: "Quicksand", sans-serif;
+  --app-font-mono: "JetBrains Mono", "Menlo", monospace;
+
+  /* Light Mode Variables - Curated Soft Blue-Grey */
+  --bg-general: #eef4f9;
+  --bg-tarjetas: #ffffff;
+  --texto-principal: #3c3c3c;
+  --color-marca-azul: #1cb0f6;
+  --sombra-marca-azul: #1899d6;
+  --color-marca-verde: #58cc02;
+  --sombra-marca-verde: #58a700;
+  --color-fuego: #ff4b4b;
+  --color-oro: #ffd900;
+  --borde-tarjeta: 2px solid #e5e5e5;
+  --sombra-inferior: 0 4px 0 #e5e5e5;
+  --gris-bloqueado: #afbfcf;
+  --linea-conexion: #e5e5e5;
+  --radius: 1.5rem; /* Highly curved rounded corners */
 }
 
+[data-theme="dark"] {
+  --background: 210 30% 10%;
+  --foreground: 210 20% 95%;
+
+  --card: 213 30% 15%; /* Corresponds to #1A2430 */
+  --card-foreground: 210 20% 95%;
+  --border: 213 25% 22%;
+  --input: 213 25% 22%;
+
+  --bg-general: #0e1621; /* Beautiful dark obsidian background */
+  --bg-tarjetas: #1a2430; /* Lighter dark contrast cards */
+  --texto-principal: #eceff1;
+  --color-marca-azul: #1cb0f6;
+  --sombra-marca-azul: #1483b8;
+  --color-marca-verde: #58cc02;
+  --sombra-marca-verde: #3e8e00;
+  --color-fuego: #ff4b4b;
+  --color-oro: #ccae00;
+  --borde-tarjeta: 2px solid #233142;
+  --sombra-inferior: 0 4px 0 #233142;
+  --gris-bloqueado: #435466;
+  --linea-conexion: #233142;
+}
+
+.pylearn-card {
+  background-color: var(--bg-tarjetas);
+  color: var(--texto-principal);
+  border: var(--borde-tarjeta);
+  border-radius: 24px; /* Highly curved */
+  box-shadow: var(--sombra-inferior);
+  transition: all 0.3s ease;
+  padding: 1.5rem;
+}
+
+.pylearn-card:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 transparent; /* The rubber button effect */
+}
+
+.pylearn-btn {
+  background-color: var(--color-marca-azul);
+  color: #ffffff;
+  border: none;
+  border-radius: 16px;
+  box-shadow: var(--sombra-inferior);
+  transition: all 0.3s ease;
+  padding: 0.75rem 1.5rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pylearn-btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 transparent;
+}
 @layer base {
   * {
     @apply border-border;
   }
 
+  /* Buttery smooth synchronized theme transitions for colors and backgrounds */
+  body,
+  header,
+  nav,
+  div,
+  button,
+  span,
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  a,
+  li,
+  ul,
+  section,
+  main,
+  label,
+  input,
+  select,
+  textarea,
+  svg,
+  path {
+    transition:
+      background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) !important,
+      border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) !important,
+      color 200ms cubic-bezier(0.4, 0, 0.2, 1) !important,
+      box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+
   body {
     @apply font-sans antialiased text-foreground;
-    background-color: #eef4f9;
+    background-color: var(--bg-general);
   }
-  
-  h1, h2, h3, h4, h5, h6 {
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-display);
-    @apply font-extrabold tracking-tight text-slate-800;
+    @apply font-extrabold tracking-tight text-slate-800 dark:text-slate-100;
   }
 }
 
 /* ─── Rich themed background for all pages ─── */
 .page-bg {
-  background-color: #eef4f9;
+  background-color: var(--bg-general);
+  transition: background-color 0.3s ease;
   background-image:
-    radial-gradient(ellipse 120% 80% at 5% 0%, rgba(28, 176, 246, 0.07) 0%, transparent 70%),
-    radial-gradient(ellipse 100% 70% at 95% 100%, rgba(88, 204, 2, 0.06) 0%, transparent 70%),
-    radial-gradient(ellipse 90% 60% at 50% 40%, rgba(255, 200, 0, 0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 80% 50% at 80% 20%, rgba(206, 130, 255, 0.04) 0%, transparent 70%),
-    radial-gradient(ellipse 100% 60% at 20% 80%, rgba(28, 176, 246, 0.03) 0%, transparent 70%);
+    radial-gradient(
+      ellipse 120% 80% at 5% 0%,
+      rgba(28, 176, 246, 0.07) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 100% 70% at 95% 100%,
+      rgba(88, 204, 2, 0.06) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 90% 60% at 50% 40%,
+      rgba(255, 200, 0, 0.04) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 80% 50% at 80% 20%,
+      rgba(206, 130, 255, 0.04) 0%,
+      transparent 70%
+    ),
+    radial-gradient(
+      ellipse 100% 60% at 20% 80%,
+      rgba(28, 176, 246, 0.03) 0%,
+      transparent 70%
+    );
   background-attachment: fixed;
   position: relative;
 }
 
 .page-bg::before {
-  content: '';
+  content: "";
   position: fixed;
   top: 0;
   left: 0;
@@ -147,10 +275,26 @@
   pointer-events: none;
   z-index: 0;
   background-image:
-    radial-gradient(circle 800px at 15% 25%, rgba(28, 176, 246, 0.04) 0%, transparent 100%),
-    radial-gradient(circle 600px at 85% 75%, rgba(88, 204, 2, 0.04) 0%, transparent 100%),
-    radial-gradient(circle 500px at 50% 5%, rgba(255, 200, 0, 0.03) 0%, transparent 100%),
-    radial-gradient(circle 700px at 70% 50%, rgba(206, 130, 255, 0.025) 0%, transparent 100%);
+    radial-gradient(
+      circle 800px at 15% 25%,
+      rgba(28, 176, 246, 0.04) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      circle 600px at 85% 75%,
+      rgba(88, 204, 2, 0.04) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      circle 500px at 50% 5%,
+      rgba(255, 200, 0, 0.03) 0%,
+      transparent 100%
+    ),
+    radial-gradient(
+      circle 700px at 70% 50%,
+      rgba(206, 130, 255, 0.025) 0%,
+      transparent 100%
+    );
 }
 
 .page-bg > * {
@@ -178,7 +322,14 @@
   @apply bg-white text-slate-500 border-2 border-b-[4px] border-slate-200 rounded-2xl hover:bg-slate-50 hover:border-slate-300;
 }
 .card-bouncy {
-  @apply bg-white rounded-3xl border-2 border-b-[6px] border-slate-200 transition-all hover:border-b-[4px] hover:translate-y-[2px] hover:shadow-sm cursor-pointer;
+  background-color: var(--bg-tarjetas);
+  color: var(--texto-principal);
+  border: var(--borde-tarjeta);
+  border-bottom-width: 6px;
+  border-radius: 24px;
+  box-shadow: var(--sombra-inferior);
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 /* Active states for 3D buttons to squish down */
@@ -203,13 +354,13 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #E5E5E5;
+  background: #e5e5e5;
   border-radius: 10px;
   border: 2px solid #f7f9fa;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #CCCCCC;
+  background: #cccccc;
 }
 
 /* Code block customization */
@@ -223,16 +374,26 @@
 
 /* Fun pulsating badge */
 @keyframes pulse-soft {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
 }
 .animate-pulse-soft {
   animation: pulse-soft 2s infinite ease-in-out;
 }
 
 @keyframes bounce-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
 }
 .animate-bounce-slow {
   animation: bounce-slow 3s infinite ease-in-out;
@@ -240,19 +401,20 @@
 
 /* Floating animation for hero particles */
 @keyframes float {
-  0%, 100% { 
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
     opacity: 0.4;
   }
-  25% { 
+  25% {
     transform: translateY(-15px) rotate(5deg);
     opacity: 0.6;
   }
-  50% { 
+  50% {
     transform: translateY(-25px) rotate(-3deg);
     opacity: 0.5;
   }
-  75% { 
+  75% {
     transform: translateY(-10px) rotate(2deg);
     opacity: 0.7;
   }
@@ -263,9 +425,15 @@
 
 /* Subtle shimmer for gradient text */
 @keyframes shimmer {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 .bg-clip-text {
   background-size: 200% 200%;

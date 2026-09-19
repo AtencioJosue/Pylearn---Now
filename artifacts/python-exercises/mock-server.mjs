@@ -10,13 +10,13 @@ const PORT = 3001;
 
 const exercises = [
   // ── Variables ──
-  { id: 1, title: "Creando tu primera variable", description: "Las variables son como cajas donde guardas datos. Crea una variable y asígnale un valor.", topic: "Variables", difficulty: "beginner", type: "fill_blank", question: "# Crea una variable llamada 'edad' con el valor 17\n___ = 17\nprint(edad)", options: null, hint: "Recuerda: el nombre de la variable va a la izquierda del signo =", explanation: "En Python, las variables se crean simplemente asignando un valor con el operador =. No necesitas declarar el tipo.", orderIndex: 1 },
+  { id: 1, title: "Creando tu primera variable", description: "Las variables son como cajas donde guardas datos. Crea una variable y asígnale un valor.", topic: "Variables", difficulty: "beginner", type: "fill_blank", question: "# Crea una variable llamada 'edad' con el valor 17\n___ = 17\nprint(edad)", options: ["edad", "print", "17", "variable", "int", "str"], hint: "Recuerda: el nombre de la variable va a la izquierda del signo =", explanation: "En Python, las variables se crean simplemente asignando un valor con el operador =. No necesitas declarar el tipo.", orderIndex: 1 },
   { id: 2, title: "Tipos de datos básicos", description: "Python tiene varios tipos de datos. ¿Puedes identificar qué tipo es cada uno?", topic: "Variables", difficulty: "beginner", type: "multiple_choice", question: "¿Qué tipo de dato es el valor 3.14?", options: ["int", "float", "str", "bool"], hint: "Piensa en los números con punto decimal", explanation: "3.14 es un número decimal, por lo tanto es de tipo float (punto flotante).", orderIndex: 2 },
   { id: 3, title: "Reasignando variables", description: "Las variables pueden cambiar su valor en cualquier momento.", topic: "Variables", difficulty: "beginner", type: "predict_output", question: "x = 10\nx = x + 5\nprint(x)", options: null, hint: "Primero x vale 10, luego se le suma 5", explanation: "x empieza valiendo 10. Luego x = x + 5 calcula 10 + 5 = 15 y lo guarda en x.", orderIndex: 3 },
 
   // ── Strings ──
   { id: 4, title: "Concatenación de strings", description: "Aprende a unir textos en Python.", topic: "Strings", difficulty: "beginner", type: "predict_output", question: 'nombre = "Py"\napellido = "thon"\nprint(nombre + apellido)', options: null, hint: "El operador + une strings", explanation: "El operador + concatena (une) dos strings. 'Py' + 'thon' = 'Python'.", orderIndex: 1 },
-  { id: 5, title: "f-strings mágicas", description: "Las f-strings son la forma moderna de formatear texto en Python.", topic: "Strings", difficulty: "beginner", type: "fill_blank", question: 'lenguaje = "Python"\nversion = 3\n# Completa para que imprima: \"Uso Python 3\"\nprint(f\"Uso {___} {version}\")', options: null, hint: "Dentro de las llaves {} va el nombre de la variable", explanation: "Las f-strings permiten insertar variables directamente en el texto usando {nombre_variable}.", orderIndex: 2 },
+  { id: 5, title: "f-strings mágicas", description: "Las f-strings son la forma moderna de formatear texto en Python.", topic: "Strings", difficulty: "beginner", type: "fill_blank", question: 'lenguaje = "Python"\nversion = 3\n# Completa para que imprima: \"Uso Python 3\"\nprint(f\"Uso {___} {version}\")', options: ["lenguaje", "python", "version", "f", "print", "str"], hint: "Dentro de las llaves {} va el nombre de la variable", explanation: "Las f-strings permiten insertar variables directamente en el texto usando {nombre_variable}.", orderIndex: 2 },
   { id: 6, title: "Métodos de strings", description: "Los strings tienen métodos útiles para transformar texto.", topic: "Strings", difficulty: "beginner", type: "predict_output", question: 'texto = "hola mundo"\nprint(texto.upper())', options: null, hint: ".upper() convierte todo a mayúsculas", explanation: "El método .upper() devuelve una copia del string con todos los caracteres en mayúsculas.", orderIndex: 3 },
   { id: 7, title: "Slicing de strings", description: "Puedes cortar partes de un string usando índices.", topic: "Strings", difficulty: "beginner", type: "predict_output", question: 'palabra = "PYTHON"\nprint(palabra[0:3])', options: null, hint: "El slicing [0:3] toma los caracteres del índice 0 al 2 (el 3 no se incluye)", explanation: "El slicing [0:3] extrae los caracteres en las posiciones 0, 1 y 2, es decir 'PYT'.", orderIndex: 4 },
 
@@ -28,10 +28,10 @@ const exercises = [
   // ── Bucles ──
   { id: 11, title: "Tu primer bucle for", description: "Los bucles for repiten código para cada elemento de una secuencia.", topic: "Bucles", difficulty: "beginner", type: "predict_output", question: 'for i in range(3):\n    print(i)', options: null, hint: "range(3) genera 0, 1, 2", explanation: "range(3) genera los números 0, 1, 2. El bucle imprime cada uno en una línea.", orderIndex: 1 },
   { id: 12, title: "Bucle while", description: "El bucle while se repite mientras una condición sea verdadera.", topic: "Bucles", difficulty: "beginner", type: "predict_output", question: 'contador = 0\nwhile contador < 3:\n    contador += 1\nprint(contador)', options: null, hint: "El bucle se repite hasta que contador ya no sea menor que 3", explanation: "El bucle incrementa contador: 0→1→2→3. Cuando llega a 3, la condición es falsa y se sale. Imprime 3.", orderIndex: 2 },
-  { id: 13, title: "Iterando sobre una lista", description: "Puedes recorrer los elementos de una lista con un bucle for.", topic: "Bucles", difficulty: "beginner", type: "fill_blank", question: 'animales = ["gato", "perro", "pez"]\nfor animal ___ animales:\n    print(animal)', options: null, hint: "¿Qué palabra clave se usa para iterar?", explanation: "La palabra clave 'in' se usa para iterar sobre los elementos de una secuencia en un bucle for.", orderIndex: 3 },
+  { id: 13, title: "Iterando sobre una lista", description: "Puedes recorrer los elementos de una lista con un bucle for.", topic: "Bucles", difficulty: "beginner", type: "fill_blank", question: 'animales = ["gato", "perro", "pez"]\nfor animal ___ animales:\n    print(animal)', options: ["in", "of", "for", "to", "loop", "from"], hint: "¿Qué palabra clave se usa para iterar?", explanation: "La palabra clave 'in' se usa para iterar sobre los elementos de una secuencia en un bucle for.", orderIndex: 3 },
 
   // ── Funciones ──
-  { id: 14, title: "Definir una función", description: "Las funciones son bloques de código reutilizables.", topic: "Funciones", difficulty: "beginner", type: "fill_blank", question: '# Define una función que salude\n___ saludar():\n    print("¡Hola!")\n\nsaludar()', options: null, hint: "¿Qué palabra clave se usa para definir funciones en Python?", explanation: "La palabra clave 'def' se usa para definir funciones en Python.", orderIndex: 1 },
+  { id: 14, title: "Definir una función", description: "Las funciones son bloques de código reutilizables.", topic: "Funciones", difficulty: "beginner", type: "fill_blank", question: '# Define una función que salude\n___ saludar():\n    print("¡Hola!")\n\nsaludar()', options: ["def", "function", "fun", "create", "void", "let"], hint: "¿Qué palabra clave se usa para definir funciones en Python?", explanation: "La palabra clave 'def' se usa para definir funciones en Python.", orderIndex: 1 },
   { id: 15, title: "Función con retorno", description: "Las funciones pueden devolver valores con return.", topic: "Funciones", difficulty: "beginner", type: "predict_output", question: 'def doble(n):\n    return n * 2\n\nresultado = doble(5)\nprint(resultado)', options: null, hint: "La función multiplica el parámetro por 2", explanation: "doble(5) calcula 5 * 2 = 10. La función devuelve 10 con return.", orderIndex: 2 },
   { id: 16, title: "Parámetros múltiples", description: "Las funciones pueden recibir varios parámetros.", topic: "Funciones", difficulty: "beginner", type: "predict_output", question: 'def suma(a, b):\n    return a + b\n\nprint(suma(3, 7))', options: null, hint: "La función suma los dos parámetros", explanation: "suma(3, 7) calcula 3 + 7 = 10.", orderIndex: 3 },
 
@@ -43,7 +43,7 @@ const exercises = [
   // ── Intermedio ──
   { id: 20, title: "List comprehension", description: "Crea listas de forma compacta con list comprehensions.", topic: "Intermedio", difficulty: "intermediate", type: "predict_output", question: 'cuadrados = [x**2 for x in range(5)]\nprint(cuadrados)', options: null, hint: "range(5) genera 0,1,2,3,4 y se eleva al cuadrado cada uno", explanation: "La list comprehension crea [0, 1, 4, 9, 16] elevando al cuadrado cada número de 0 a 4.", orderIndex: 1 },
   { id: 21, title: "Función lambda", description: "Las funciones lambda son funciones anónimas de una sola línea.", topic: "Intermedio", difficulty: "intermediate", type: "predict_output", question: 'doble = lambda x: x * 2\nprint(doble(8))', options: null, hint: "Lambda funciona igual que una función normal pero en una línea", explanation: "La función lambda toma x y devuelve x*2. doble(8) = 16.", orderIndex: 2 },
-  { id: 22, title: "Manejo de excepciones", description: "Try/except te permite manejar errores sin que el programa falle.", topic: "Intermedio", difficulty: "intermediate", type: "fill_blank", question: '# Completa para capturar el error\ntry:\n    resultado = 10 / 0\n___ ZeroDivisionError:\n    print("¡No puedes dividir entre cero!")', options: null, hint: "¿Qué palabra clave se usa para capturar excepciones?", explanation: "La palabra clave 'except' se usa para capturar y manejar excepciones en un bloque try/except.", orderIndex: 3 },
+  { id: 22, title: "Manejo de excepciones", description: "Try/except te permite manejar errores sin que el programa falle.", topic: "Intermedio", difficulty: "intermediate", type: "fill_blank", question: '# Completa para capturar el error\ntry:\n    resultado = 10 / 0\n___ ZeroDivisionError:\n    print("¡No puedes dividir entre cero!")', options: ["except", "catch", "error", "try", "finally", "else"], hint: "¿Qué palabra clave se usa para capturar excepciones?", explanation: "La palabra clave 'except' se usa para capturar y manejar excepciones en un bloque try/except.", orderIndex: 3 },
   { id: 23, title: "Args y kwargs", description: "Aprende sobre argumentos variables en funciones.", topic: "Intermedio", difficulty: "intermediate", type: "predict_output", question: 'def suma(*args):\n    return sum(args)\n\nprint(suma(1, 2, 3, 4))', options: null, hint: "*args recoge todos los argumentos posicionales en una tupla", explanation: "*args permite recibir un número variable de argumentos. sum((1,2,3,4)) = 10.", orderIndex: 4 },
 
   // ── Difícil ──
@@ -72,7 +72,9 @@ const correctAnswers = {
 
 // In-memory stores
 const users = new Map();
-const completedExercises = new Set(); // track completed exercise IDs
+const completedExercises = new Set([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]); // track completed exercise IDs
+let totalAttempts = 13;
+let totalCorrectAnswers = 13;
 const forumPosts = [];
 let forumPostIdCounter = 1;
 const forumComments = new Map(); // postId -> Comment[]
@@ -117,7 +119,8 @@ function getProgress() {
   return {
     totalExercises: exercises.length,
     completedExercises: completedExercises.size,
-    correctAnswers: completedExercises.size,
+    correctAnswers: totalCorrectAnswers,
+    totalAttempts: totalAttempts,
     topicProgress: topics,
   };
 }
@@ -170,8 +173,12 @@ const server = http.createServer(async (req, res) => {
     const normalize = (s) => s.replace(/\s+/g, ' ').trim().toLowerCase();
     const correct = normalize(answer) === normalize(correctAnswer);
     
+    totalAttempts += 1;
     if (correct) {
-      completedExercises.add(id);
+      if (!completedExercises.has(id)) {
+        completedExercises.add(id);
+        totalCorrectAnswers += 1;
+      }
     }
 
     return jsonResponse(res, {
@@ -320,6 +327,13 @@ const server = http.createServer(async (req, res) => {
         feedback: exercise.ai_feedback,
       }
     });
+  }
+
+  // ── Root redirect to frontend ──
+  if (path === '/' || path === '') {
+    res.writeHead(302, { Location: 'http://localhost:5173' });
+    res.end();
+    return;
   }
 
   // ── 404 ──

@@ -1,307 +1,504 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight, Play, X } from "lucide-react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
+import {
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  CircleHelp,
+  Code2,
+  Eye,
+  Lightbulb,
+  PlayCircle,
+  Rocket,
+  Sparkles,
+  TriangleAlert,
+  X,
+  XCircle,
+  type LucideIcon,
+} from "lucide-react";
+import { CodeBlock } from "@/components/CodeBlock";
+import {
+  getTheoryLesson,
+  type TheoryLessonContext,
+} from "@/features/learning/theoryLessons";
 
-interface Slide {
-  title: string;
-  subtitle?: string;
-  content: string;
-  code?: string;
-  emoji: string;
-}
-
-const topicSlides: Record<string, Slide[]> = {
-  Variables: [
-    {
-      emoji: "📦",
-      title: "La caja mágica: Variables",
-      subtitle: "Guarda cosas para usarlas después",
-      content: "Imagina que tienes una caja de cartón en tu cuarto y le pones una etiqueta con un marcador negro que dice 'ropa'. ¡Eso es una variable en Python! Es una caja donde guardas un dato y le pones un nombre para no perderlo.",
-      code: `# Metiendo cosas a las cajas
-edad = 17
-nombre = "Ana Campeona"
-nivel = 9999`,
-    },
-    {
-      emoji: "🤪",
-      title: "Cambiando de opinión",
-      subtitle: "Reasignando valores",
-      content: "Lo genial de las cajas (variables) es que puedes sacar lo que tienen y meter algo nuevo. Python no se enoja. ¡Puedes cambiar un número las veces que quieras!",
-      code: `dinero = 100
-# Oh oh, compramos algo caro...
-dinero = 2
-print(dinero) # Imprime: 2 (¡Pobre!)`,
-    },
-    {
-      emoji: "👮",
-      title: "La policía del código",
-      subtitle: "Reglas de nombres",
-      content: "No puedes nombrar a tu perro '@*#1'. ¡En Python tampoco! Los nombres deben empezar con letras, sin espacios. Usamos el guión bajo para separar palabras (snake_case).",
-      code: `mi_nivel_poder = 9000  # ✅ ¡Excelente!
-_top_secret = 42       # ✅ Cool
-
-# 1_jugador = "Juan"   # ❌ (Empieza con número)
-# mi poder = 9000      # ❌ (Tiene espacios)`,
-    },
-  ],
-
-  Strings: [
-    {
-      emoji: "🗣️",
-      title: "Strings: Python hablando",
-      subtitle: "El arte del Texto",
-      content: "Un String (cadena) es básicamente TEXTO. Si no lo pones entre comillas, Python pensará que estás invocando un hechizo mágico o una variable que no existe y entrará en pánico.",
-      code: `saludo = "¡Hola mundo loco!"
-pensamiento = 'Las comillas simples también valen'
-
-print(saludo)`,
-    },
-    {
-      emoji: "🔪",
-      title: "Slicing: Cortando palabras",
-      subtitle: "Como un ninja",
-      content: "¡Puedes rebanar palabras! Con `[inicio:fin]` puedes robarte pedazos de un texto. Empieza a contar desde 0.",
-      code: `palabra = "PYTHON"
-# P=0 Y=1 T=2 H=3 O=4 N=5
-
-print(palabra[0:2]) # Imprime: PY
-print(palabra[-1])  # Imprime: N (El último)`,
-    },
-    {
-      emoji: "✨",
-      title: "La Magia de f-strings",
-      subtitle: "La forma cool de mezclar texto",
-      content: "A nadie le gusta usar el signo + para pegar palabras. Usa las `f-strings`. Solo pon una 'f' al principio y mete tus variables en {llavecitas}. Es súper fácil e intuitivo.",
-      code: `juego = "Zelda"
-horas = 350
-# La forma PRO:
-mensaje = f"He jugado {juego} por {horas} horas"
-print(mensaje)`,
-    },
-  ],
-
-  Listas: [
-    {
-      emoji: "🎒",
-      title: "Tu Mochila: La Lista",
-      subtitle: "Mete todo lo que quieras",
-      content: "¿Por qué tener 10 variables si puedes tener una sola lista con 10 cosas? Una lista es como tu mochila del colegio, le cabe de todo: libros, comida, ¡y hasta cosas repetidas!",
-      code: `mochila = ["Libro", "Laptop", "Sándwich"]
-numeros = [10, 99, 42]
-locura = ["Texto", 42, True, [1, 2]]
-
-print(mochila[0]) # Imprime: Libro`,
-    },
-    {
-      emoji: "💥",
-      title: "Métodos destructivos",
-      subtitle: "append y remove",
-      content: "¿Se te olvidó el lápiz? Usa `append()` y lo pones al final. ¿Te comiste el sándwich? Usa `remove()` y desaparece de la lista. ¡Magia!",
-      code: `bolsa = ["Poción"]
-
-bolsa.append("Espada") # ["Poción", "Espada"]
-bolsa.remove("Poción") # ["Espada"] (Usamos poción)`,
-    },
-  ],
-
-  Bucles: [
-    {
-      emoji: "🐹",
-      title: "La rueda del Hámster",
-      subtitle: "Bucles For",
-      content: "¿Te gusta escribir lo mismo 100 veces? ¡A nosotros tampoco! El bucle `for` hace tareas repetitivas por ti mientras tú te tomas un café. Piensa en él como un robot trabajador.",
-      code: `# El robot dice Hola 3 veces
-for i in range(3):
-    print("Hola, jefe")`,
-    },
-    {
-      emoji: "♾️",
-      title: "El Agujero Negro",
-      subtitle: "Bucles While",
-      content: "El bucle `while` se repite mientras algo siga siendo verdad (`True`). ¡Cuidado! Si la condición nunca cambia, el programa correrá hasta que tu computadora explote (bucle infinito).",
-      code: `energia = 3
-while energia > 0:
-    print(f"Me muevo. Energía: {energia}")
-    energia -= 1 # ⚠️ ¡Super importante restar!
-print("¡A dormir!")`,
-    },
-  ],
-
-  Funciones: [
-    {
-      emoji: "🏭",
-      title: "Fábricas de Código",
-      subtitle: "¿Qué es una función?",
-      content: "Una función es como un hechizo personalizado o una máquina de fábrica. Tú la programas una vez, y luego solo dices la palabra mágica para que trabaje las veces que quieras.",
-      code: `def hechizo_fuego():
-    print("🔥 ¡FIREBALL! 🔥")
-
-hechizo_fuego()
-hechizo_fuego() # Doble daño jaja`,
-    },
-    {
-      emoji: "🚚",
-      title: "Recibiendo ingredientes",
-      subtitle: "Parámetros",
-      content: "Tu máquina puede recibir ingredientes para trabajar distinto. Si la máquina hace jugos, y le pasas naranja, sale jugo de naranja. A los ingredientes les llamamos 'parámetros'.",
-      code: `def saludar(nombre):
-    print(f"¡Hola {nombre}, bienvenido!")
-
-saludar("Carlos") # Usa "Carlos" como ingrediente`,
-    },
-  ],
-
-  Diccionarios: [
-    {
-      emoji: "📖",
-      title: "Diccionarios Reales",
-      subtitle: "Palabra y Significado",
-      content: "Un diccionario en Python es igual que uno de verdad. Tienes una palabra (Clave) y su significado (Valor). Es la forma más rápida de buscar información del universo.",
-      code: `jugador = {
-    "nombre": "Link",
-    "vidas": 3,
-    "arma": "Espada Maestra"
-}
-
-print(jugador["arma"]) # "Espada Maestra"`,
-    },
-  ]
-};
-
-interface IntroSlidesProps {
-  topic: string;
+interface IntroSlidesProps extends TheoryLessonContext {
   onClose: () => void;
   onStart: () => void;
 }
 
-export function IntroSlides({ topic, onClose, onStart }: IntroSlidesProps) {
-  // Si no tenemos el tema en el diccionario, inventamos una slide genérica divertida.
-  const genericSlides: Slide[] = [{
-      emoji: "🐍", title: `Desafío: ${topic}`, subtitle: "Estás listo para esto",
-      content: "Repasa mentalmente lo que sabes sobre este tema. Tu misión es aplastar este desafío. ¡Los errores son parte de aprender, así que no tengas miedo de intentar!",
-  }];
-  
-  const slides = topicSlides[topic] ?? genericSlides;
+interface SlideMeta {
+  short: string;
+  title: string;
+  Icon: LucideIcon;
+}
+
+const SLIDES: SlideMeta[] = [
+  { short: "Idea", title: "Primero, una imagen", Icon: Lightbulb },
+  { short: "Ejemplo", title: "Mira cómo cambia", Icon: PlayCircle },
+  { short: "Compara", title: "Un detalle importa", Icon: TriangleAlert },
+  { short: "Reto", title: "¿Qué pasará?", Icon: CircleHelp },
+  { short: "Practica", title: "Ahora te toca", Icon: Rocket },
+];
+
+const FLOW_EMOJIS = ["👀", "⚙️", "✨"];
+
+function firstSentence(text: string) {
+  return text.match(/^.*?[.!?](?=\s|$)/)?.[0] ?? text;
+}
+
+function SlideHeading({ slide }: { slide: SlideMeta }) {
+  const Icon = slide.Icon;
+  return (
+    <header className="mb-5 text-center md:mb-7">
+      <div className="mx-auto mb-3 flex w-fit items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-primary">
+        <Icon className="h-4 w-4" />
+        {slide.short}
+      </div>
+      <h2 className="font-display text-3xl font-black leading-tight text-slate-900 dark:text-white md:text-5xl">
+        {slide.title}
+      </h2>
+    </header>
+  );
+}
+
+export function IntroSlides({
+  topic,
+  exerciseTitle,
+  description,
+  question,
+  explanation,
+  hint,
+  onClose,
+  onStart,
+}: IntroSlidesProps) {
+  const lesson = useMemo(
+    () =>
+      getTheoryLesson({
+        topic,
+        exerciseTitle,
+        description,
+        question,
+        explanation,
+        hint,
+      }),
+    [topic, exerciseTitle, description, question, explanation, hint],
+  );
   const [current, setCurrent] = useState(0);
-  const slide = slides[current];
+  const [furthest, setFurthest] = useState(0);
+  const [traceStep, setTraceStep] = useState(0);
+  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
+  const visualAnalogy = firstSentence(lesson.analogy);
 
-  if (!slide) return null;
+  const lastTraceStep = Math.max(lesson.trace.length - 1, 0);
+  const isLastSlide = current === SLIDES.length - 1;
+  const quizCorrect = selectedAnswer === lesson.quiz.answer;
+  const quizNeedsAnswer = current === 3 && !quizCorrect;
+  const percent = ((current + 1) / SLIDES.length) * 100;
 
-  const isLast = current === slides.length - 1;
+  useEffect(() => {
+    setCurrent(0);
+    setFurthest(0);
+    setTraceStep(0);
+    setSelectedAnswer(null);
+  }, [topic]);
 
-  const goNext = () => {
-    if (isLast) onStart();
-    else setCurrent(c => c + 1);
+  const openSlide = useCallback((slide: number) => {
+    setCurrent(slide);
+    setFurthest((reached) => Math.max(reached, slide));
+  }, []);
+
+  const goNext = useCallback(() => {
+    if (current === 1 && traceStep < lastTraceStep) {
+      setTraceStep((step) => step + 1);
+      return;
+    }
+    if (quizNeedsAnswer) return;
+    if (isLastSlide) {
+      onStart();
+      return;
+    }
+    openSlide(current + 1);
+  }, [
+    current,
+    isLastSlide,
+    lastTraceStep,
+    onStart,
+    openSlide,
+    quizNeedsAnswer,
+    traceStep,
+  ]);
+
+  const goBack = useCallback(() => {
+    if (current === 1 && traceStep > 0) {
+      setTraceStep((step) => step - 1);
+      return;
+    }
+    setCurrent((slide) => Math.max(0, slide - 1));
+  }, [current, traceStep]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "ArrowLeft") goBack();
+      if (event.key === "ArrowRight") goNext();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [goBack, goNext, onClose]);
+
+  const renderContent = () => {
+    if (current === 0) {
+      return (
+        <div>
+          <SlideHeading slide={SLIDES[current]} />
+          <div className="grid items-center gap-5 lg:grid-cols-[0.8fr_1.2fr]">
+            <div className="rounded-[2rem] border-2 border-amber-200 bg-gradient-to-br from-amber-50 via-orange-50 to-white p-6 text-center dark:border-amber-900/60 dark:from-amber-950/35 dark:via-orange-950/20 dark:to-slate-900 md:p-8">
+              <motion.div
+                animate={{ y: [0, -7, 0], rotate: [0, -2, 2, 0] }}
+                transition={{ duration: 3, repeat: Infinity }}
+                className="text-7xl md:text-8xl"
+                aria-hidden="true"
+              >
+                {lesson.emoji}
+              </motion.div>
+              <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-amber-600 dark:text-amber-300">
+                {lesson.analogyTitle}
+              </p>
+              <p className="mx-auto mt-3 max-w-md text-base font-bold leading-relaxed text-slate-700 dark:text-slate-200 md:text-lg">
+                {visualAnalogy}
+              </p>
+            </div>
+
+            <div className="rounded-[2rem] border border-slate-200 bg-slate-50/80 p-5 dark:border-slate-700 dark:bg-slate-950/45 md:p-7">
+              <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
+                {lesson.recap.slice(0, 3).map((item, index) => (
+                  <div key={item} className="contents">
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.85 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: index * 0.14 }}
+                      className="flex min-h-28 flex-1 flex-col items-center justify-center rounded-2xl border-2 border-white bg-white p-4 text-center shadow-md shadow-slate-200/60 dark:border-slate-700 dark:bg-slate-900 dark:shadow-black/20"
+                    >
+                      <span className="text-3xl" aria-hidden="true">
+                        {FLOW_EMOJIS[index]}
+                      </span>
+                      <span className="mt-2 text-sm font-black text-slate-800 dark:text-white">
+                        {item}
+                      </span>
+                    </motion.div>
+                    {index < Math.min(lesson.recap.length, 3) - 1 && (
+                      <ArrowRight className="mx-auto h-5 w-5 shrink-0 rotate-90 text-primary sm:rotate-0" />
+                    )}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 flex items-center justify-center gap-2 rounded-2xl bg-sky-100 px-4 py-3 text-center text-sm font-black text-sky-800 dark:bg-sky-950/60 dark:text-sky-200">
+                <Eye className="h-5 w-5 shrink-0" />
+                Entiende el recorrido; no memorices la respuesta.
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (current === 1) {
+      const activeTrace =
+        lesson.trace[traceStep] ?? lesson.trace[0] ?? "Observa el cambio.";
+      const traceFinished = traceStep === lastTraceStep;
+      return (
+        <div>
+          <SlideHeading slide={SLIDES[current]} />
+          <div className="grid gap-5 xl:grid-cols-[minmax(0,1.25fr)_minmax(280px,.75fr)]">
+            <CodeBlock code={lesson.code} />
+            <div className="flex flex-col rounded-[2rem] border border-slate-200 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-950/50">
+              <div className="flex items-center justify-between">
+                <span className="rounded-full bg-primary px-3 py-1 text-xs font-black uppercase tracking-widest text-white">
+                  Paso {traceStep + 1}
+                </span>
+                <span className="text-xs font-bold text-slate-400">
+                  {traceStep + 1}/{lesson.trace.length}
+                </span>
+              </div>
+              <div className="my-5 flex gap-2" aria-hidden="true">
+                {lesson.trace.map((_, index) => (
+                  <motion.span
+                    key={index}
+                    animate={{
+                      backgroundColor:
+                        index <= traceStep ? "hsl(var(--primary))" : "#cbd5e1",
+                      scale: index === traceStep ? 1.12 : 1,
+                    }}
+                    className="h-2.5 flex-1 rounded-full"
+                  />
+                ))}
+              </div>
+              <motion.div
+                key={traceStep}
+                initial={{ opacity: 0, x: 18 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-1 items-center justify-center rounded-2xl border-2 border-primary/20 bg-white p-6 text-center dark:bg-slate-900"
+                aria-live="polite"
+              >
+                <p className="text-lg font-black leading-relaxed text-slate-800 dark:text-white">
+                  {activeTrace}
+                </p>
+              </motion.div>
+              {traceFinished && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  className="mt-4 rounded-2xl border-2 border-emerald-300 bg-emerald-50 p-4 text-center dark:border-emerald-800 dark:bg-emerald-950/40"
+                >
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600 dark:text-emerald-300">
+                    Resultado
+                  </p>
+                  <code className="mt-1 block whitespace-pre-wrap font-mono text-base font-black text-emerald-800 dark:text-emerald-100">
+                    {lesson.output}
+                  </code>
+                </motion.div>
+              )}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (current === 2) {
+      return (
+        <div>
+          <SlideHeading slide={SLIDES[current]} />
+          <div className="grid gap-5 lg:grid-cols-2">
+            <div className="rounded-[2rem] border-2 border-rose-200 bg-rose-50/70 p-4 dark:border-rose-900/60 dark:bg-rose-950/20">
+              <h3 className="mb-3 flex items-center justify-center gap-2 font-black text-rose-700 dark:text-rose-300">
+                <XCircle className="h-5 w-5" /> Así no
+              </h3>
+              <CodeBlock code={lesson.mistake} />
+            </div>
+            <div className="rounded-[2rem] border-2 border-emerald-200 bg-emerald-50/70 p-4 dark:border-emerald-900/60 dark:bg-emerald-950/20">
+              <h3 className="mb-3 flex items-center justify-center gap-2 font-black text-emerald-700 dark:text-emerald-300">
+                <CheckCircle2 className="h-5 w-5" /> Así sí
+              </h3>
+              <CodeBlock code={lesson.correction} />
+            </div>
+          </div>
+          <div className="mx-auto mt-5 flex max-w-3xl items-start gap-3 rounded-2xl border border-violet-200 bg-violet-50 p-4 text-violet-950 dark:border-violet-900/60 dark:bg-violet-950/30 dark:text-violet-100">
+            <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-violet-500" />
+            <p className="font-bold leading-relaxed">{lesson.why}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (current === 3) {
+      return (
+        <div>
+          <SlideHeading slide={SLIDES[current]} />
+          <div className="mx-auto max-w-3xl rounded-[2rem] border-2 border-violet-200 bg-gradient-to-br from-violet-50 to-fuchsia-50 p-5 dark:border-violet-900/60 dark:from-violet-950/35 dark:to-fuchsia-950/20 md:p-7">
+            <p className="text-center text-xl font-black leading-relaxed text-slate-900 dark:text-white md:text-2xl">
+              {lesson.quiz.prompt}
+            </p>
+            <div className="mt-6 grid gap-3">
+              {lesson.quiz.options.map((option, index) => {
+                const selected = selectedAnswer === index;
+                const correct = selected && index === lesson.quiz.answer;
+                const incorrect = selected && index !== lesson.quiz.answer;
+                return (
+                  <button
+                    key={option}
+                    onClick={() => setSelectedAnswer(index)}
+                    aria-pressed={selected}
+                    className={`flex items-center gap-3 rounded-2xl border-2 bg-white px-4 py-3 text-left font-bold transition-all hover:-translate-y-0.5 dark:bg-slate-900 ${
+                      correct
+                        ? "border-emerald-500 text-emerald-700 dark:text-emerald-300"
+                        : incorrect
+                          ? "border-rose-400 text-rose-700 dark:text-rose-300"
+                          : "border-slate-200 text-slate-700 hover:border-primary/50 dark:border-slate-700 dark:text-slate-200"
+                    }`}
+                  >
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-slate-100 text-sm dark:bg-slate-800">
+                      {String.fromCharCode(65 + index)}
+                    </span>
+                    <span className="flex-1">{option}</span>
+                    {correct && <CheckCircle2 className="h-5 w-5" />}
+                    {incorrect && <XCircle className="h-5 w-5" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+          {selectedAnswer !== null && (
+            <motion.div
+              key={selectedAnswer}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              className={`mx-auto mt-4 max-w-3xl rounded-2xl border p-4 text-center font-bold ${
+                quizCorrect
+                  ? "border-emerald-200 bg-emerald-50 text-emerald-900 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-100"
+                  : "border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900/60 dark:bg-rose-950/30 dark:text-rose-100"
+              }`}
+            >
+              {quizCorrect
+                ? `✓ ${lesson.quiz.explanation}`
+                : "Casi. Mira el ejemplo y prueba otra opción."}
+            </motion.div>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div>
+        <SlideHeading slide={SLIDES[current]} />
+        <div className="mx-auto max-w-4xl rounded-[2rem] border-2 border-primary/25 bg-gradient-to-br from-primary/10 via-white to-emerald-50 p-6 text-center dark:via-slate-900 dark:to-emerald-950/25 md:p-9">
+          <motion.div
+            animate={{ scale: [1, 1.08, 1] }}
+            transition={{ duration: 2.4, repeat: Infinity }}
+            className="mx-auto grid h-20 w-20 place-items-center rounded-[1.75rem] bg-primary text-white shadow-xl shadow-primary/25"
+          >
+            <Code2 className="h-10 w-10" />
+          </motion.div>
+          <p className="mt-6 text-xs font-black uppercase tracking-[0.22em] text-primary">
+            Mini misión
+          </p>
+          <p className="mx-auto mt-3 max-w-2xl text-xl font-black leading-relaxed text-slate-800 dark:text-white md:text-2xl">
+            {lesson.challenge}
+          </p>
+          <div className="mt-7 flex flex-wrap justify-center gap-2">
+            {lesson.recap.map((item) => (
+              <span
+                key={item}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-white px-3 py-1.5 text-sm font-bold text-primary dark:bg-slate-900"
+              >
+                <Check className="h-3.5 w-3.5" /> {item}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   };
 
-  const percent = ((current + 1) / slides.length) * 100;
+  const nextLabel = isLastSlide
+    ? "Ir al ejercicio"
+    : current === 1 && traceStep < lastTraceStep
+      ? "Ver siguiente cambio"
+      : quizNeedsAnswer
+        ? "Elige la respuesta"
+        : "Siguiente";
 
   return (
-    <div className="fixed inset-0 z-[100] bg-white flex flex-col pt-4 overflow-hidden">
-      {/* ── Barra superior Header ── */}
-      <div className="w-full max-w-5xl mx-auto px-6 h-16 flex items-center gap-4">
-        <button
-          onClick={onClose}
-          className="text-slate-400 hover:text-slate-600 transition-colors"
-        >
-          <X className="w-8 h-8" />
-        </button>
-        <div className="flex-1">
-          <div className="h-4 bg-slate-200 rounded-full overflow-hidden w-full">
-             <div 
-                className="h-full bg-[#58CC02] rounded-full transition-all duration-500 relative"
-                style={{ width: `${percent}%` }}
-             >
-                <div className="absolute top-1 left-2 right-2 h-1 bg-white/30 rounded-full" />
-             </div>
+    <div
+      className="fixed inset-0 z-[200] flex flex-col overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-white"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`Teoría de ${topic}`}
+    >
+      <div className="pointer-events-none absolute -left-28 top-28 h-72 w-72 rounded-full bg-sky-400/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-20 bottom-20 h-80 w-80 rounded-full bg-emerald-400/10 blur-3xl" />
+
+      <header className="relative z-10 shrink-0 border-b border-slate-200 bg-white/90 px-4 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-950/90 md:px-6">
+        <div className="mx-auto flex max-w-6xl items-center gap-3">
+          <button
+            onClick={onClose}
+            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white"
+            aria-label="Cerrar teoría"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <span className="text-2xl" aria-hidden="true">
+            {lesson.emoji}
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center justify-between gap-3 text-[11px] font-black uppercase tracking-widest text-slate-500">
+              <span className="truncate">{lesson.title}</span>
+              <span className="shrink-0">
+                {current + 1}/{SLIDES.length}
+              </span>
+            </div>
+            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
+              <motion.div
+                className="h-full rounded-full bg-gradient-to-r from-sky-500 via-primary to-emerald-500"
+                animate={{ width: `${percent}%` }}
+                transition={{ type: "spring", stiffness: 180, damping: 24 }}
+              />
+            </div>
           </div>
         </div>
-      </div>
+      </header>
 
-      {/* ── Contenido Principal de Diapositiva ── */}
-      <div className="flex-1 flex flex-col md:flex-row items-center justify-center max-w-5xl mx-auto w-full px-6 gap-8 md:gap-16 pb-24">
-        
-        {/* Mascota y Emoji (Lado izquierdo) */}
-        <div className="flex-shrink-0 flex flex-col items-center justify-center">
-             <AnimatePresence mode="wait">
-                <motion.div
-                  key={slide.emoji}
-                  initial={{ scale: 0, rotate: -20 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  exit={{ scale: 0, opacity: 0 }}
-                  className="text-8xl md:text-9xl relative drop-shadow-[0_10px_20px_rgba(0,0,0,0.1)] mb-4"
-                >
-                  {slide.emoji}
-                </motion.div>
-             </AnimatePresence>
-             <div className="relative w-32 md:w-48 animate-bounce-slow mt-4 hidden md:block">
-                 <img src={`${import.meta.env.BASE_URL}images/python-mascot.png`} alt="Asistente Python" className="w-full drop-shadow-xl" />
-             </div>
-        </div>
-
-        {/* Textos y Código (Lado derecho) */}
-        <div className="flex-1 max-w-xl">
-             <AnimatePresence mode="wait">
-                 <motion.div
-                    key={current}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                 >
-                    {slide.subtitle && (
-                      <h4 className="text-primary font-extrabold uppercase tracking-widest text-sm mb-2">{slide.subtitle}</h4>
-                    )}
-                    <h2 className="text-3xl md:text-5xl font-display font-extrabold text-slate-800 mb-6 leading-tight">
-                        {slide.title}
-                    </h2>
-                    
-                    <div className="relative mb-8">
-                        <p className="text-lg text-slate-600 font-medium leading-relaxed bg-slate-50 p-6 rounded-3xl border-2 border-slate-200">
-                          {slide.content}
-                        </p>
-                        {/* Triangle arrow for chat bubble */}
-                        <div className="absolute top-1/2 -left-4 w-4 h-4 bg-slate-50 border-b-2 border-l-2 border-slate-200 transform -translate-y-1/2 rotate-45 hidden md:block" />
-                    </div>
-
-                    {slide.code && (
-                    <div className="bg-[#1f2937] rounded-3xl p-6 border-b-[6px] border-[#111827] shadow-xl overflow-x-auto relative">
-                        <div className="absolute top-3 left-4 flex gap-1.5">
-                            <div className="w-3 h-3 rounded-full bg-red-400"></div>
-                            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
-                            <div className="w-3 h-3 rounded-full bg-green-400"></div>
-                        </div>
-                        <pre className="text-[15px] text-[#58CC02] font-mono leading-loose whitespace-pre-wrap mt-4 font-bold">
-                            {slide.code}
-                        </pre>
-                    </div>
-                    )}
-                 </motion.div>
-             </AnimatePresence>
-        </div>
-      </div>
-
-      {/* ── Footer de botones (Bottom dock) ── */}
-      <div className="fixed bottom-0 left-0 right-0 border-t-2 border-slate-200 bg-white">
-          <div className="max-w-5xl mx-auto px-6 h-32 flex items-center justify-between">
-              {current > 0 ? (
-                  <button
-                    onClick={() => setCurrent(c => c - 1)}
-                    className="btn-bouncy btn-outline-gray px-8 py-3.5 font-extrabold text-lg uppercase tracking-wide"
-                  >
-                    Retroceder
-                  </button>
-              ) : <div />}
-              
+      <nav
+        aria-label="Diapositivas de teoría"
+        className="relative z-10 shrink-0 border-b border-slate-200/70 bg-white/60 px-4 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-950/60"
+      >
+        <div className="mx-auto flex max-w-3xl justify-center gap-1.5 sm:gap-3">
+          {SLIDES.map((slide, index) => {
+            const Icon = slide.Icon;
+            const reached = index <= furthest;
+            return (
               <button
-                onClick={goNext}
-                className="btn-bouncy btn-green px-12 py-4 font-extrabold text-xl uppercase tracking-widest flex items-center gap-2"
+                key={slide.short}
+                disabled={!reached}
+                onClick={() => reached && setCurrent(index)}
+                className={`flex min-w-0 items-center gap-1.5 rounded-xl px-2.5 py-2 text-xs font-black transition-all sm:px-3 ${
+                  index === current
+                    ? "bg-primary text-white shadow-md shadow-primary/20"
+                    : reached
+                      ? "text-slate-600 hover:bg-white dark:text-slate-300 dark:hover:bg-slate-800"
+                      : "text-slate-300 dark:text-slate-700"
+                }`}
               >
-                {isLast ? "¡PRACTICAR!" : "CONTINUAR"}
-                {!isLast && <ChevronRight className="w-6 h-6 stroke-[3]" />}
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">{slide.short}</span>
               </button>
-          </div>
-      </div>
+            );
+          })}
+        </div>
+      </nav>
+
+      <main className="relative z-0 min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-4 py-5 md:px-6 md:py-7">
+        <motion.section
+          key={current}
+          initial={{ opacity: 0, x: 24, scale: 0.985 }}
+          animate={{ opacity: 1, x: 0, scale: 1 }}
+          transition={{ duration: 0.22 }}
+          className="mx-auto max-w-6xl rounded-[2rem] border border-slate-200 bg-white/90 p-5 shadow-xl shadow-slate-200/40 backdrop-blur dark:border-slate-800 dark:bg-slate-900/80 dark:shadow-black/20 md:p-8"
+        >
+          {renderContent()}
+        </motion.section>
+      </main>
+
+      <footer className="relative z-10 shrink-0 border-t border-slate-200 bg-white/95 px-4 py-3 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95 md:px-6">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3">
+          <button
+            onClick={goBack}
+            disabled={current === 0 && traceStep === 0}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl border-2 border-slate-200 px-4 font-black text-slate-600 disabled:invisible dark:border-slate-700 dark:text-slate-300"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span className="hidden sm:inline">Atrás</span>
+          </button>
+          <p className="hidden text-xs font-bold text-slate-400 md:block">
+            Usa ← → para avanzar
+          </p>
+          <button
+            onClick={goNext}
+            disabled={quizNeedsAnswer}
+            className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-primary px-5 font-black text-white shadow-lg shadow-primary/20 transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none disabled:hover:translate-y-0 dark:disabled:bg-slate-700"
+          >
+            {nextLabel}
+            {isLastSlide ? (
+              <ArrowRight className="h-5 w-5" />
+            ) : (
+              <ChevronRight className="h-5 w-5" />
+            )}
+          </button>
+        </div>
+      </footer>
     </div>
   );
 }

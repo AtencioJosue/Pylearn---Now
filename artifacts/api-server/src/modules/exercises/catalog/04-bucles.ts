@@ -1,0 +1,135 @@
+import type { ExerciseData } from "../types";
+
+export const topicExercises: ExerciseData[] = [
+  {
+    "id": 10,
+    "title": "Bucle for básico",
+    "description": "Itera sobre una lista con for.",
+    "topic": "Bucles",
+    "difficulty": "beginner",
+    "type": "predict_output",
+    "question": "for i in range(3):\n    print(i)",
+    "hint": "range(3) genera los números 0, 1, 2.",
+    "explanation": "range(3) genera los números 0, 1 y 2 (no incluye el 3). El bucle imprime cada uno en una línea separada.",
+    "correctAnswer": "0\n1\n2",
+    "orderIndex": 10
+  },
+  {
+    "id": 11,
+    "title": "Suma con bucle",
+    "description": "Acumula valores con un bucle.",
+    "topic": "Bucles",
+    "difficulty": "intermediate",
+    "type": "predict_output",
+    "question": "total = 0\nfor n in [1, 2, 3, 4]:\n    total += n\nprint(total)",
+    "hint": "+= suma y asigna al mismo tiempo.",
+    "explanation": "El bucle suma 1+2+3+4 = 10. total empieza en 0 y se le va agregando cada número.",
+    "correctAnswer": "10",
+    "orderIndex": 11
+  },
+  {
+    "id": 12,
+    "title": "Bucle while",
+    "description": "Ejecuta código mientras una condición sea verdadera.",
+    "topic": "Bucles",
+    "difficulty": "intermediate",
+    "type": "predict_output",
+    "question": "x = 1\nwhile x < 4:\n    print(x)\n    x += 1",
+    "hint": "x empieza en 1 y se incrementa hasta que ya no sea menor que 4.",
+    "explanation": "El bucle imprime 1, 2, 3. Cuando x llega a 4, la condición x < 4 es falsa y el bucle termina.",
+    "correctAnswer": "1\n2\n3",
+    "orderIndex": 12
+  },
+  {
+    "id": 49,
+    "title": "Bucle while",
+    "description": "El bucle while repite un bloque de código mientras una condición sea verdadera. Es útil cuando no sabes de antemano cuántas veces se repetirá.",
+    "topic": "Bucles",
+    "difficulty": "beginner",
+    "type": "predict_output",
+    "question": "contador = 1\nwhile contador <= 4:\n    print(contador)\n    contador += 1",
+    "hint": "El bucle imprime contador y lo incrementa. ¿Cuándo se detiene?",
+    "explanation": "El bucle comienza con contador=1 e imprime 1, 2, 3, 4. Cuando contador llega a 5, la condición contador<=4 es False y el bucle termina. Cada iteración imprime el valor actual.",
+    "correctAnswer": "1\n2\n3\n4",
+    "orderIndex": 49
+  },
+  {
+    "id": 50,
+    "title": "break: salir del bucle",
+    "description": "La sentencia break interrumpe inmediatamente el bucle más cercano, sin importar si la condición sigue siendo verdadera.",
+    "topic": "Bucles",
+    "difficulty": "beginner",
+    "type": "predict_output",
+    "question": "for i in range(10):\n    if i == 5:\n        break\n    print(i)",
+    "hint": "El bucle se detiene en cuanto i vale 5, antes de imprimir ese valor.",
+    "explanation": "El bucle for itera i desde 0 hasta 9. Cuando i es 5, se ejecuta break antes del print, por eso 5 no se imprime. Se imprime del 0 al 4.",
+    "correctAnswer": "0\n1\n2\n3\n4",
+    "orderIndex": 50
+  },
+  {
+    "id": 51,
+    "title": "continue: saltar una iteración",
+    "description": "La sentencia continue salta el resto del código en la iteración actual y pasa directamente a la siguiente, sin salir del bucle.",
+    "topic": "Bucles",
+    "difficulty": "beginner",
+    "type": "predict_output",
+    "question": "for i in range(1, 6):\n    if i == 3:\n        continue\n    print(i)",
+    "hint": "continue salta la iteración cuando i==3, pero el bucle continúa.",
+    "explanation": "Cuando i es 3, continue hace que se salte el print(3) y vaya directo al siguiente i. Por eso se imprimen todos los números del 1 al 5 excepto el 3.",
+    "correctAnswer": "1\n2\n4\n5",
+    "orderIndex": 51
+  },
+  {
+    "id": 52,
+    "title": "range() con paso",
+    "description": "range(inicio, fin, paso) genera una secuencia de números. El paso puede ser positivo o negativo, permitiendo contar hacia arriba o hacia abajo.",
+    "topic": "Bucles",
+    "difficulty": "beginner",
+    "type": "predict_output",
+    "question": "for n in range(10, 0, -2):\n    print(n)",
+    "hint": "Empieza en 10 y va restando 2 en cada paso, hasta que llegue a 0 (sin incluirlo).",
+    "explanation": "range(10, 0, -2) genera: 10, 8, 6, 4, 2. Comienza en 10, resta 2 cada vez, y se detiene antes de llegar a 0. Se imprimen los 5 valores.",
+    "correctAnswer": "10\n8\n6\n4\n2",
+    "orderIndex": 52
+  },
+  {
+    "id": 53,
+    "title": "enumerate(): índice y valor",
+    "description": "enumerate() recorre una lista dándote tanto el índice como el valor de cada elemento. Evita tener que usar un contador manual.",
+    "topic": "Bucles",
+    "difficulty": "beginner",
+    "type": "predict_output",
+    "question": "frutas = [\"manzana\", \"banana\", \"cereza\"]\nfor i, fruta in enumerate(frutas):\n    print(f\"{i}: {fruta}\")",
+    "hint": "enumerate() genera pares (índice, valor) empezando desde 0.",
+    "explanation": "enumerate() genera (0, 'manzana'), (1, 'banana'), (2, 'cereza'). Cada par se desempaqueta en i y fruta. El resultado son tres líneas con el formato 'índice: valor'.",
+    "correctAnswer": "0: manzana\n1: banana\n2: cereza",
+    "orderIndex": 53
+  },
+  {
+    "id": 54,
+    "title": "zip(): combinar listas",
+    "description": "zip() combina dos o más listas en pares, recorriendo todos simultáneamente. Se detiene cuando la lista más corta se agota.",
+    "topic": "Bucles",
+    "difficulty": "beginner",
+    "type": "predict_output",
+    "question": "nombres = [\"Ana\", \"Luis\", \"Eva\"]\nedades = [22, 30, 25]\nfor nombre, edad in zip(nombres, edades):\n    print(f\"{nombre} tiene {edad} años\")",
+    "hint": "zip() empareja: ('Ana', 22), ('Luis', 30), ('Eva', 25).",
+    "explanation": "zip() combina las dos listas elemento por elemento. En cada iteración, nombre y edad reciben el valor correspondiente de cada lista. Se imprimen las 3 líneas una por una.",
+    "correctAnswer": "Ana tiene 22 años\nLuis tiene 30 años\nEva tiene 25 años",
+    "orderIndex": 54
+  },
+  {
+    "id": 55,
+    "title": "Bucles anidados",
+    "description": "Un bucle anidado es un bucle dentro de otro bucle. El bucle interno se ejecuta completamente en cada iteración del bucle externo.",
+    "topic": "Bucles",
+    "difficulty": "beginner",
+    "type": "predict_output",
+    "question": "for i in range(1, 3):\n    for j in range(1, 3):\n        print(f\"{i}x{j}={i*j}\")",
+    "hint": "El bucle externo va de 1 a 2, y por cada valor ejecuta el bucle interno (también 1 a 2).",
+    "explanation": "i toma valores 1 y 2. Por cada i, j también toma 1 y 2. Eso da 4 combinaciones: 1x1=1, 1x2=2, 2x1=2, 2x2=4. El bucle interno se ejecuta completo por cada iteración del externo.",
+    "correctAnswer": "1x1=1\n1x2=2\n2x1=2\n2x2=4",
+    "orderIndex": 55
+  }
+];
+

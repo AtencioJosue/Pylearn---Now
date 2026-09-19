@@ -89,6 +89,13 @@ paths:
       operationId: getProgress
       tags: [exercises]
       summary: Get user progress
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
       responses:
         "200":
           description: Progress data
@@ -96,6 +103,25 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Progress"
+  /gamification/status:
+    get:
+      operationId: getGamificationStatus
+      tags: [exercises]
+      summary: Get user gamification status (XP and League)
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            minLength: 1
+      responses:
+        "200":
+          description: Gamification status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GamificationStatus"
 components:
   schemas:
     HealthStatus:
@@ -121,7 +147,16 @@ components:
           enum: [beginner, intermediate, advanced, tryhard]
         type:
           type: string
-          enum: [multiple_choice, fill_blank, predict_output]
+          enum:
+            [
+              multiple_choice,
+              multiple_select,
+              fill_blank,
+              predict_output,
+              bug,
+              order,
+              code,
+            ]
         question:
           type: string
         options:
@@ -134,6 +169,20 @@ components:
           type: string
         orderIndex:
           type: integer
+        coins:
+          type: integer
+        xp:
+          type: integer
+        theme:
+          type: string
+        pytoReaction:
+          type: string
+        lesson:
+          type: string
+        skills:
+          type: array
+          items:
+            type: string
       required:
         - id
         - title
@@ -149,8 +198,15 @@ components:
       properties:
         answer:
           type: string
+        userId:
+          type: string
+          minLength: 1
+        doubleOrNothing:
+          type: boolean
+          default: false
       required:
         - answer
+        - userId
     AnswerResult:
       type: object
       properties:
@@ -160,10 +216,17 @@ components:
           type: string
         correctAnswer:
           type: string
+        xpEarned:
+          type: integer
+          minimum: 0
+        alreadyCompleted:
+          type: boolean
       required:
         - correct
         - feedback
         - correctAnswer
+        - xpEarned
+        - alreadyCompleted
     Progress:
       type: object
       properties:
@@ -177,8 +240,44 @@ components:
           type: object
           additionalProperties:
             type: integer
+        totalAttempts:
+          type: integer
+        reviewExerciseIds:
+          type: array
+          items:
+            type: integer
       required:
         - totalExercises
         - completedExercises
         - correctAnswers
         - topicProgress
+        - totalAttempts
+        - reviewExerciseIds
+    GamificationStatus:
+      type: object
+      properties:
+        totalXp:
+          type: integer
+        weeklyXp:
+          type: integer
+        leagueTier:
+          type: integer
+        boardId:
+          type: string
+        currentLevel:
+          type: integer
+        xpInCurrentLevel:
+          type: integer
+        xpNeededForNextLevel:
+          type: integer
+        percentage:
+          type: integer
+      required:
+        - totalXp
+        - weeklyXp
+        - leagueTier
+        - boardId
+        - currentLevel
+        - xpInCurrentLevel
+        - xpNeededForNextLevel
+        - percentage

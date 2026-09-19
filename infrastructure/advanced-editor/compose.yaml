@@ -1,0 +1,29 @@
+# Local prototype: each Compose project gets its own files and installed packages.
+services:
+  editor:
+    build: .
+    image: pylearn-advanced-editor:local
+    init: true
+    ports:
+      - "127.0.0.1:${PYLEARN_EDITOR_PORT:-8080}:8080"
+    volumes:
+      - projects:/home/coder/projects
+      - editor-data:/home/coder/.local/share/code-server
+      - python-env:/home/coder/.venv
+    secrets:
+      - editor_password
+    mem_limit: 2g
+    cpus: 2
+    pids_limit: 256
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+secrets:
+  editor_password:
+    file: ${PYLEARN_EDITOR_SECRET:?Use Start-Editor.ps1 to create a local password}
+volumes:
+  projects:
+  editor-data:
+  python-env:

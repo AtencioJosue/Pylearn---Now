@@ -34,7 +34,12 @@ export default defineConfig({
   resolve: {
     alias: {
       "@": path.resolve(import.meta.dirname, "src"),
-      "@assets": path.resolve(import.meta.dirname, "..", "..", "attached_assets"),
+      "@assets": path.resolve(
+        import.meta.dirname,
+        "..",
+        "..",
+        "attached_assets",
+      ),
     },
     dedupe: ["react", "react-dom"],
   },
@@ -42,14 +47,37 @@ export default defineConfig({
   build: {
     outDir: path.resolve(import.meta.dirname, "dist/public"),
     emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks(moduleId) {
+          if (
+            moduleId.includes("react-syntax-highlighter") ||
+            moduleId.includes("highlight.js") ||
+            moduleId.includes("refractor") ||
+            moduleId.includes("prismjs") ||
+            moduleId.includes("lowlight")
+          ) {
+            return "syntax-highlighter";
+          }
+        },
+      },
+    },
   },
   server: {
     port,
     host: "0.0.0.0",
     allowedHosts: true,
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "credentialless",
+    },
     proxy: {
-      '/api': {
-        target: 'http://localhost:3001',
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+      "/uploads": {
+        target: "http://localhost:3001",
         changeOrigin: true,
       },
     },
@@ -62,5 +90,9 @@ export default defineConfig({
     port,
     host: "0.0.0.0",
     allowedHosts: true,
+    headers: {
+      "Cross-Origin-Opener-Policy": "same-origin",
+      "Cross-Origin-Embedder-Policy": "credentialless",
+    },
   },
 });

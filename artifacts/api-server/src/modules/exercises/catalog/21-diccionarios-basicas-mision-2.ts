@@ -1,0 +1,218 @@
+import type { ExerciseData } from "../types";
+
+export const topicExercises: ExerciseData[] = [
+  {
+    "id": 204,
+    "title": "Diccionarios: Modificar diccionarios",
+    "description": "Pylearn sube al nivel 6 y desbloquea magia. ¿Cómo actualiza su ficha correctamente?",
+    "topic": "Diccionarios básicas - Misión 2",
+    "difficulty": "intermediate",
+    "type": "multiple_choice",
+    "question": "heroe = {\"nombre\":\"Pylearn\", \"nivel\":5, \"hp\":100}",
+    "options": [
+      "heroe.add(\"nivel\", 6)\nheroe.add(\"magia\", 75)",
+      "heroe.update(nivel=6)\nheroe.append(\"magia\", 75)",
+      "heroe[\"nivel\"] = 6\nheroe[\"magia\"] = 75",
+      "heroe.nivel = 6\nheroe.magia = 75"
+    ],
+    "hint": "Pista: Revisa los conceptos de Modificar diccionarios.",
+    "explanation": "Para modificar: dict[\"clave\"] = nuevo_valor. Para agregar: exactamente igual. Si la clave no existe, se CREA. Si ya existe, se ACTUALIZA. Simple, consistente y pythónico. ¡Subiste de nivel! ⬆️",
+    "correctAnswer": "heroe[\"nivel\"] = 6\nheroe[\"magia\"] = 75",
+    "orderIndex": 204,
+    "coins": 12,
+    "xp": 20,
+    "theme": "⬆️ Subiendo de nivel",
+    "pytoReaction": "¡LEVEL UP! Pylearn desbloqueó la magia arcana 🐍✨"
+  },
+  {
+    "id": 205,
+    "title": "Diccionarios: KeyError y .get()",
+    "description": "¿Qué retorna el escudo anti-crash de Pylearn?",
+    "topic": "Diccionarios básicas - Misión 2",
+    "difficulty": "intermediate",
+    "type": "predict_output",
+    "question": "heroe = {\"nombre\":\"Pylearn\", \"ataque\":100}\nvelocidad = heroe.get(\"velocidad\", \"No tiene\")\nprint(velocidad)",
+    "options": [
+      "KeyError",
+      "None",
+      "No tiene",
+      "0"
+    ],
+    "hint": "Pista: Revisa los conceptos de KeyError y .get().",
+    "explanation": ".get(\"clave\", default) es el escudo anti-crash. Si la clave no existe, devuelve el default que le pasaste (\"No tiene\") en lugar de explotar. ¡Siempre preferirlo a [] cuando hay duda! 🛡️",
+    "correctAnswer": "No tiene",
+    "orderIndex": 205,
+    "coins": 12,
+    "xp": 20,
+    "theme": "🛡️ Escudo anti-crash",
+    "pytoReaction": "¡Cero crashes! .get() es el bodyguard de Pylearn 🐍🛡️"
+  },
+  {
+    "id": 206,
+    "title": "Diccionarios: Dict comprehension con condición",
+    "description": "Pylearn crea un dict solo con los jugadores que pasaron 100 puntos:",
+    "topic": "Diccionarios básicas - Misión 2",
+    "difficulty": "intermediate",
+    "type": "fill_blank",
+    "question": "resultados = {\"Ana\":120, \"Luis\":85, \"María\":150, \"Pedro\":95}\ncampeones = {n: p ___ n, p in resultados.items() if p > 100}\nprint(campeones)",
+    "options": [
+      "for",
+      "in",
+      "while",
+      "from",
+      "where",
+      "if"
+    ],
+    "hint": "Pista: Revisa los conceptos de Dict comprehension con condición.",
+    "explanation": "{k: v for k, v in dict.items() if condicion} es el dict comprehension con filtro. Solo Ana(120) y María(150) superan 100. Resultado: {'Ana':120, 'María':150}. ¡Los campeones tienen su dict! 🏆",
+    "correctAnswer": "for",
+    "orderIndex": 206,
+    "coins": 12,
+    "xp": 20,
+    "theme": "🏆 Filtrando campeones del torneo",
+    "pytoReaction": "¡Ana y María son campeonas! Pylearn organiza el torneo 🐍🏆"
+  },
+  {
+    "id": 207,
+    "title": "Diccionarios: Fusión de dicts (Python 3.9+)",
+    "description": "¿Cuál es el resultado de fusionar los datos de los dos satélites?",
+    "topic": "Diccionarios básicas - Misión 2",
+    "difficulty": "intermediate",
+    "type": "predict_output",
+    "question": "satelite_a = {\"temp\": -270, \"presion\": 0}\nsatelite_b = {\"temp\": -265, \"velocidad\": 7800}\nfusion = satelite_a | satelite_b\nprint(fusion[\"temp\"])",
+    "options": [
+      "-270",
+      "-265",
+      "0",
+      "Error: no se pueden fusionar dicts con |"
+    ],
+    "hint": "Pista: Revisa los conceptos de Fusión de dicts (Python 3.9+).",
+    "explanation": "El operador | (Python 3.9+) fusiona dos dicts. Si hay claves duplicadas, el dict de la DERECHA gana. satelite_b tiene temp=-265 que sobreescribe el -270 de satelite_a. ¡Dato del satélite B prevalece! 🚀",
+    "correctAnswer": "-265",
+    "orderIndex": 207,
+    "coins": 12,
+    "xp": 20,
+    "theme": "🚀 Fusión de datos de dos satélites",
+    "pytoReaction": "¡Fusión exitosa! Pylearn usa Python 3.9+ como buen dev 🐍🚀"
+  },
+  {
+    "id": 208,
+    "title": "Diccionarios: Diccionario como switch",
+    "description": "¿Qué imprime el sistema de comandos cuando Pylearn escribe 'atacar'?",
+    "topic": "Diccionarios básicas - Misión 2",
+    "difficulty": "intermediate",
+    "type": "multiple_choice",
+    "question": "comandos = {\n    \"atacar\": \"Inflinges 50 de daño\",\n    \"defender\": \"Reduces 30 de daño\",\n    \"huir\": \"Escapas de la batalla\"\n}\naccion = \"atacar\"\nprint(comandos.get(accion, \"Comando desconocido\"))",
+    "options": [
+      "atacar",
+      "Inflinges 50 de daño",
+      "Comando desconocido",
+      "None"
+    ],
+    "hint": "Pista: Revisa los conceptos de Diccionario como switch.",
+    "explanation": "Usar un dict como tabla de dispatch es más elegante que múltiples if/elif. .get() con default maneja comandos desconocidos. 'atacar' existe → retorna su valor. ¡El sistema de comandos de Pylearn es pro! 🎮",
+    "correctAnswer": "Inflinges 50 de daño",
+    "orderIndex": 208,
+    "coins": 12,
+    "xp": 20,
+    "theme": "🎮 Sistema de comandos del juego",
+    "pytoReaction": "¡50 de daño! El dict de comandos de Pylearn es devastador 🐍⚔️"
+  },
+  {
+    "id": 209,
+    "title": "Diccionarios: Dict comprehension",
+    "description": "Pylearn convierte su lista de héroes en un dict {nombre: nivel} en una línea:",
+    "topic": "Diccionarios básicas - Misión 2",
+    "difficulty": "advanced",
+    "type": "fill_blank",
+    "question": "heroes = [(\"Pylearn\",99),(\"Ana\",15),(\"Luis\",8)]\nniveles = {n: lv ___ n, lv in heroes}\nprint(niveles)",
+    "options": [
+      "for",
+      "in",
+      "while",
+      "if",
+      "from",
+      "each"
+    ],
+    "hint": "Pista: Revisa los conceptos de Dict comprehension.",
+    "explanation": "{clave: valor for clave, valor in lista} es el dict comprehension. Es como el list comprehension pero crea un diccionario. La línea completa: {n: lv for n, lv in heroes}. ¡Magia de nivel 99! ✨",
+    "correctAnswer": "for",
+    "orderIndex": 209,
+    "coins": 25,
+    "xp": 35,
+    "theme": "✨ Magia pythónica nivel 99",
+    "pytoReaction": "¡Un dict en una línea! Pylearn es un hechicero de Python 🐍✨"
+  },
+  {
+    "id": 210,
+    "title": "Diccionarios: Ordenar dict por valor",
+    "description": "¿Cuál es el nombre del ganador del torneo?",
+    "topic": "Diccionarios básicas - Misión 2",
+    "difficulty": "advanced",
+    "type": "predict_output",
+    "question": "scores = {\"Pylearn\": 980, \"Ana\": 1050, \"Luis\": 920, \"María\": 1100}\nganador = max(scores, key=lambda k: scores[k])\nprint(ganador)",
+    "options": [
+      "Pylearn",
+      "Ana",
+      "Luis",
+      "María"
+    ],
+    "hint": "Pista: Revisa los conceptos de Ordenar dict por valor.",
+    "explanation": "max(dict, key=función) encuentra la clave con el mayor valor. La lambda k: scores[k] le dice a max() que compare por los valores del dict, no por las claves. María tiene 1100 — el mayor. ¡La ganadora del torneo! 🏆",
+    "correctAnswer": "María",
+    "orderIndex": 210,
+    "coins": 25,
+    "xp": 35,
+    "theme": "🏆 Ranking del torneo de programación",
+    "pytoReaction": "¡María gana el torneo! Pylearn en segundo con 980 🐍🏆"
+  },
+  {
+    "id": 211,
+    "title": "Diccionarios: defaultdict pattern",
+    "description": "Pylearn agrupa piratas por su tripulación sin errores de KeyError:",
+    "topic": "Diccionarios básicas - Misión 2",
+    "difficulty": "advanced",
+    "type": "fill_blank",
+    "question": "piratas = [(\"Luffy\",\"SombPaja\"),(\"Zoro\",\"SombPaja\"),(\"Law\",\"CorazonH\"),(\"Nami\",\"SombPaja\")]\ntripulaciones = {}\nfor pirata, crew in piratas:\n    if crew not ___ tripulaciones:\n        tripulaciones[crew] = []\n    tripulaciones[crew].append(pirata)\nprint(len(tripulaciones[\"SombPaja\"]))",
+    "options": [
+      "in",
+      "at",
+      "of",
+      "from",
+      "within",
+      "has"
+    ],
+    "hint": "Pista: Revisa los conceptos de defaultdict pattern.",
+    "explanation": "'not in' verifica si la clave NO existe aún. Si no existe, crea la lista vacía primero. Luego append() agrega el pirata. Resultado: SombPaja tiene 3 piratas (Luffy, Zoro, Nami). Alternativa elegante: defaultdict(list). 🌊",
+    "correctAnswer": "in",
+    "orderIndex": 211,
+    "coins": 25,
+    "xp": 35,
+    "theme": "🌊 Agrupando piratas por tripulación",
+    "pytoReaction": "¡3 piratas de SombPaja! Pylearn quiere unirse a la tripulación 🐍⚓"
+  },
+  {
+    "id": 212,
+    "title": "Diccionarios: Diccionarios anidados",
+    "description": "¿Cómo accedes al nivel de Pylearn en este diccionario anidado del reino?",
+    "topic": "Diccionarios básicas - Misión 2",
+    "difficulty": "tryhard",
+    "type": "multiple_choice",
+    "question": "reino = {\n  \"Pylearn\": {\"clase\":\"Mago\",\"nivel\":99,\"gremio\":\"Serpientes\"},\n  \"Ana\":  {\"clase\":\"Guerrera\",\"nivel\":85,\"gremio\":\"Dragones\"}\n}",
+    "options": [
+      "reino[\"Pylearn\"][\"nivel\"]",
+      "reino[\"nivel\"][\"Pylearn\"]",
+      "reino.Pylearn.nivel",
+      "reino[\"Pylearn\", \"nivel\"]"
+    ],
+    "hint": "Pista: Revisa los conceptos de Diccionarios anidados.",
+    "explanation": "Para diccionarios anidados se encadenan los [][]  El primero accede al dict de Pylearn, el segundo accede al campo 'nivel' dentro de ese dict. Como buscar en un archivo dentro de una carpeta 🏰",
+    "correctAnswer": "reino[\"Pylearn\"][\"nivel\"]",
+    "orderIndex": 212,
+    "coins": 50,
+    "xp": 80,
+    "theme": "🏰 Gran base de datos del reino",
+    "pytoReaction": "¡Nivel 99 confirmado! Pylearn domina hasta los dicts anidados 🐍🏰"
+  }
+];
+
