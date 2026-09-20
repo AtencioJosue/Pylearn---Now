@@ -75,10 +75,15 @@ async function buildAll() {
   });
 
   if (process.env.VERCEL_SERVERLESS === "1") {
-    await copyFile(
-      path.resolve(__dirname, "local_db.json"),
-      path.resolve(distDir, "local_db.json"),
-    );
+    try {
+      await copyFile(
+        path.resolve(__dirname, "local_db.json"),
+        path.resolve(distDir, "local_db.json"),
+      );
+    } catch (error: any) {
+      if (error?.code !== "ENOENT") throw error;
+      console.log("No local_db.json included; production will require DATABASE_URL.");
+    }
   }
 }
 

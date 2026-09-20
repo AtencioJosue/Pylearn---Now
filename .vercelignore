@@ -7,3 +7,7 @@ node_modules
 dist
 **/dist
 *.zip
+**/local_db.json
+**/uploads
+.env
+.env.*
